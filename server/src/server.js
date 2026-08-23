@@ -71,7 +71,7 @@ app.use((err, req, res, next) => {
   });
 });
 
-if (!process.env.VERCEL) {
+if (require.main === module) {
   app.listen(PORT, () => {
     console.log(`Fournn API Server running on port ${PORT}`);
   });

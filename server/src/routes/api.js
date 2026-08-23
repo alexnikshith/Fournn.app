@@ -166,6 +166,8 @@ router.get('/auth/me', authMiddleware, async (req, res) => {
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
+});
+
 // GOOGLE OAUTH ROUTES
 router.get('/auth/google/url', (req, res) => {
   const clientId = process.env.GOOGLE_CLIENT_ID || '315968482759-d55tji8aaujhb7td9tji0h57fdm5js8q.apps.googleusercontent.com';
