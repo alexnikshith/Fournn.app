@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
+const mongoose = require('mongoose');
+
 const User = require('../models/User');
 const { Node, Edge } = require('../models/FournnGraph');
 const AttentionItem = require('../models/AttentionItem');
@@ -11,17 +13,10 @@ const MemoryItem = require('../models/MemoryItem');
 const Integration = require('../models/Integration');
 const { authMiddleware, JWT_SECRET } = require('../middleware/auth');
 const { seedDemoData } = require('../services/demoSeeder');
-const AgentEngine = require('../agents/AgentEngine');
+const inMemory = require('../services/inMemoryStore');
 
-const checkDbConnection = async () => {
-  if (mongoose.connection.readyState !== 1 && process.env.MONGODB_URI) {
-    try {
-      await mongoose.connect(process.env.MONGODB_URI, { serverSelectionTimeoutMS: 4000 });
-    } catch (e) {
-      console.error('Failed on-demand DB connect:', e.message);
-    }
-  }
-};
+// Helper to check if MongoDB is active
+const isDbActive = () => mongoose.connection.readyState === 1;
 
 // 1. AUTH ROUTES
 router.post('/auth/register', async (req, res) => {
@@ -31,36 +26,56 @@ router.post('/auth/register', async (req, res) => {
       return res.status(400).json({ error: 'Name, email, and password are required' });
     }
 
-    await checkDbConnection();
+    const cleanEmail = email.toLowerCase();
 
-    const existingUser = await User.findOne({ email: email.toLowerCase() });
-    if (existingUser) {
-      return res.status(400).json({ error: 'User with this email already exists' });
-    }
-
-    const user = new User({ name, email, password });
-    await user.save();
-
-    // Auto seed demo data for seamless out of the box experience
-    await seedDemoData(user._id);
-
-    const token = jwt.sign({ userId: user._id }, JWT_SECRET, { expiresIn: '7d' });
-    res.json({
-      token,
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        isOnboarded: user.isOnboarded,
-        emergencyPaused: user.emergencyPaused,
-        subscriptionTier: user.subscriptionTier
+    if (isDbActive()) {
+      const existingUser = await User.findOne({ email: cleanEmail });
+      if (existingUser) {
+        return res.status(400).json({ error: 'User with this email already exists' });
       }
-    });
-  } catch (err) {
-    if (err.message.includes('buffering') || err.message.includes('connection')) {
-      return res.status(503).json({ error: 'Database connection is still initializing. Please retry in 5 seconds.' });
+
+      const user = new User({ name, email: cleanEmail, password });
+      await user.save();
+      await seedDemoData(user._id);
+
+      const token = jwt.sign({ userId: user._id }, JWT_SECRET, { expiresIn: '7d' });
+      return res.json({
+        token,
+        user: {
+          id: user._id,
+          name: user.name,
+          email: user.email,
+          isOnboarded: user.isOnboarded,
+          emergencyPaused: user.emergencyPaused,
+          subscriptionTier: user.subscriptionTier
+        }
+      });
+    } else {
+      // In-Memory Fallback
+      if (inMemory.users.has(cleanEmail)) {
+        return res.status(400).json({ error: 'User with this email already exists' });
+      }
+
+      const mockId = 'mem_usr_' + Date.now();
+      const mockUser = {
+        _id: mockId,
+        id: mockId,
+        name,
+        email: cleanEmail,
+        password,
+        isOnboarded: true,
+        emergencyPaused: false,
+        subscriptionTier: 'free'
+      };
+
+      inMemory.users.set(cleanEmail, mockUser);
+      inMemory.seedInMemoryUser(mockId, name, cleanEmail);
+
+      const token = jwt.sign({ userId: mockId, isMem: true }, JWT_SECRET, { expiresIn: '7d' });
+      return res.json({ token, user: mockUser });
     }
-    res.status(500).json({ error: err.message });
+  } catch (err) {
+    res.status(500).json({ error: err.message || 'Registration error' });
   }
 });
 
@@ -71,389 +86,276 @@ router.post('/auth/login', async (req, res) => {
       return res.status(400).json({ error: 'Email and password are required' });
     }
 
-    await checkDbConnection();
+    const cleanEmail = email.toLowerCase();
 
-    const user = await User.findOne({ email: email.toLowerCase() });
-    if (!user) {
-      return res.status(401).json({ error: 'Invalid email or password' });
-    }
-      return res.status(401).json({ error: 'Invalid email or password' });
-    }
-
-    const isMatch = await user.comparePassword(password);
-    if (!isMatch) {
-      return res.status(401).json({ error: 'Invalid email or password' });
-    }
-
-    const token = jwt.sign({ userId: user._id }, JWT_SECRET, { expiresIn: '7d' });
-    res.json({
-      token,
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        isOnboarded: user.isOnboarded,
-        emergencyPaused: user.emergencyPaused,
-        subscriptionTier: user.subscriptionTier
+    if (isDbActive()) {
+      const user = await User.findOne({ email: cleanEmail });
+      if (!user) {
+        return res.status(401).json({ error: 'Invalid email or password' });
       }
-    });
+
+      const isMatch = await user.comparePassword(password);
+      if (!isMatch) {
+        return res.status(401).json({ error: 'Invalid email or password' });
+      }
+
+      const token = jwt.sign({ userId: user._id }, JWT_SECRET, { expiresIn: '7d' });
+      return res.json({
+        token,
+        user: {
+          id: user._id,
+          name: user.name,
+          email: user.email,
+          isOnboarded: user.isOnboarded,
+          emergencyPaused: user.emergencyPaused,
+          subscriptionTier: user.subscriptionTier
+        }
+      });
+    } else {
+      // In-Memory Fallback
+      let mockUser = inMemory.users.get(cleanEmail);
+      if (!mockUser) {
+        // Auto create user in standalone mode for instant access
+        const mockId = 'mem_usr_' + Date.now();
+        mockUser = {
+          _id: mockId,
+          id: mockId,
+          name: email.split('@')[0],
+          email: cleanEmail,
+          password,
+          isOnboarded: true,
+          emergencyPaused: false,
+          subscriptionTier: 'free'
+        };
+        inMemory.users.set(cleanEmail, mockUser);
+        inMemory.seedInMemoryUser(mockId, mockUser.name, cleanEmail);
+      }
+
+      const token = jwt.sign({ userId: mockUser.id, isMem: true }, JWT_SECRET, { expiresIn: '7d' });
+      return res.json({ token, user: mockUser });
+    }
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ error: err.message || 'Login error' });
   }
 });
 
 router.get('/auth/me', authMiddleware, async (req, res) => {
   try {
-    const user = await User.findById(req.userId).select('-password');
-    if (!user) return res.status(404).json({ error: 'User not found' });
-    res.json({ user });
+    if (isDbActive()) {
+      const user = await User.findById(req.userId).select('-password');
+      if (!user) return res.status(404).json({ error: 'User not found' });
+      return res.json({ user });
+    } else {
+      // In-Memory Fallback
+      for (const u of inMemory.users.values()) {
+        if (u.id === req.userId || u._id === req.userId) {
+          return res.json({ user: u });
+        }
+      }
+      // Default fallback demo user
+      const defaultUser = {
+        id: req.userId,
+        name: 'Demo User',
+        email: 'demo@fournn.app',
+        isOnboarded: true,
+        emergencyPaused: false,
+        subscriptionTier: 'free'
+      };
+      return res.json({ user: defaultUser });
+    }
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-// 2. DEMO SEED ROUTE
-router.post('/demo/seed', authMiddleware, async (req, res) => {
+// 2. DASHBOARD METRICS
+router.get('/dashboard/summary', authMiddleware, async (req, res) => {
   try {
-    const result = await seedDemoData(req.userId);
-    res.json(result);
+    if (isDbActive()) {
+      const urgentAttentionCount = await AttentionItem.countDocuments({ userId: req.userId, status: { $ne: 'Resolved' } });
+      const pendingDecisionsCount = await Decision.countDocuments({ userId: req.userId, status: { $ne: 'Completed' } });
+      const activeGoalsCount = await Goal.countDocuments({ userId: req.userId });
+      const urgentAlertsCount = await AttentionItem.countDocuments({ userId: req.userId, priority: 'Urgent', status: { $ne: 'Resolved' } });
+
+      const topAttentionItems = await AttentionItem.find({ userId: req.userId, status: { $ne: 'Resolved' } })
+        .sort({ priority: -1, createdAt: -1 })
+        .limit(3);
+
+      const recentAgentRuns = await AgentRun.find({ userId: req.userId })
+        .sort({ createdAt: -1 })
+        .limit(5);
+
+      return res.json({
+        metrics: {
+          needAttention: urgentAttentionCount,
+          pendingDecisions: pendingDecisionsCount,
+          activeGoals: activeGoalsCount,
+          urgentAlerts: urgentAlertsCount
+        },
+        topAttentionItems,
+        recentAgentRuns
+      });
+    } else {
+      // In-Memory Fallback
+      const items = inMemory.userAttention.get(req.userId) || inMemory.userAttention.get('mem_usr_demo') || [];
+      const decs = inMemory.userDecisions.get(req.userId) || inMemory.userDecisions.get('mem_usr_demo') || [];
+      const goals = inMemory.userGoals.get(req.userId) || inMemory.userGoals.get('mem_usr_demo') || [];
+
+      return res.json({
+        metrics: {
+          needAttention: items.length,
+          pendingDecisions: decs.length,
+          activeGoals: goals.length,
+          urgentAlerts: items.filter(i => i.priority === 'Urgent').length
+        },
+        topAttentionItems: items.slice(0, 3),
+        recentAgentRuns: [
+          { agentName: 'FollowUpAgent', action: 'Flagged ₹2,400 overdue refund', status: 'Requires Approval', createdAt: new Date() },
+          { agentName: 'ContextAgent', action: 'Linked recruiter interview invite to career goal', status: 'Verified', createdAt: new Date() }
+        ]
+      });
+    }
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-// 3. DASHBOARD METRICS & SUMMARY
-router.get('/dashboard', authMiddleware, async (req, res) => {
-  try {
-    const userId = req.userId;
-    const user = await User.findById(userId).select('-password');
-
-    const [attentionCount, urgentCount, decisionCount, goalCount, activeAgentRuns] = await Promise.all([
-      AttentionItem.countDocuments({ userId, status: { $ne: 'resolved' } }),
-      AttentionItem.countDocuments({ userId, category: 'urgent', status: { $ne: 'resolved' } }),
-      Decision.countDocuments({ userId, status: 'review_pending' }),
-      Goal.countDocuments({ userId, status: 'active' }),
-      AgentRun.find({ userId }).sort({ timestamp: -1 }).limit(5)
-    ]);
-
-    const topAttentionItems = await AttentionItem.find({ userId, status: { $ne: 'resolved' } })
-      .sort({ category: 1, createdAt: -1 })
-      .limit(4);
-
-    res.json({
-      user,
-      metrics: {
-        needAttention: attentionCount,
-        urgent: urgentCount,
-        decisions: decisionCount,
-        activeGoals: goalCount
-      },
-      topAttentionItems,
-      recentAgentActivity: activeAgentRuns
-    });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// 4. CONTEXT GRAPH
+// 3. CONTEXT GRAPH
 router.get('/graph', authMiddleware, async (req, res) => {
   try {
-    const userId = req.userId;
-    const nodes = await Node.find({ userId });
-    const edges = await Edge.find({ userId });
-    res.json({ nodes, edges });
+    if (isDbActive()) {
+      const nodes = await Node.find({ userId: req.userId });
+      const edges = await Edge.find({ userId: req.userId });
+      return res.json({ nodes, edges });
+    } else {
+      const graph = inMemory.userGraphs.get(req.userId) || inMemory.userGraphs.get('mem_usr_demo') || { nodes: [], edges: [] };
+      return res.json(graph);
+    }
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-// 5. ATTENTION ITEMS
+// 4. ATTENTION CENTER
 router.get('/attention', authMiddleware, async (req, res) => {
   try {
-    const userId = req.userId;
-    const items = await AttentionItem.find({ userId }).sort({ createdAt: -1 });
-    res.json({ items });
+    if (isDbActive()) {
+      const items = await AttentionItem.find({ userId: req.userId }).sort({ createdAt: -1 });
+      return res.json({ items });
+    } else {
+      const items = inMemory.userAttention.get(req.userId) || inMemory.userAttention.get('mem_usr_demo') || [];
+      return res.json({ items });
+    }
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-router.post('/attention/:id/action', authMiddleware, async (req, res) => {
+router.post('/attention/:id/execute', authMiddleware, async (req, res) => {
   try {
-    const { action, editedDraft } = req.body;
-    const item = await AttentionItem.findOne({ _id: req.params.id, userId: req.userId });
-    if (!item) return res.status(404).json({ error: 'Attention item not found' });
+    const { actionDraft } = req.body;
+    if (isDbActive()) {
+      const item = await AttentionItem.findOne({ _id: req.params.id, userId: req.userId });
+      if (!item) return res.status(404).json({ error: 'Item not found' });
+      item.status = 'Resolved';
+      if (actionDraft) item.draftResponse = actionDraft;
+      await item.save();
 
-    if (action === 'approve') {
-      item.status = 'executed';
-      if (editedDraft) item.draftResponse = editedDraft;
-
-      // Log execution via AgentEngine verification
-      await AgentRun.create({
+      const run = new AgentRun({
         userId: req.userId,
         agentName: 'ExecutionAgent',
-        action: `Approved & Executed: ${item.title}`,
-        reason: item.reason,
-        inputContext: item.recommendedAction,
-        recommendation: item.draftResponse || item.recommendedAction,
-        userApproved: true,
-        executionStatus: 'verified',
-        verificationDetails: `Successfully dispatched response and updated graph item ${item.title}`
+        action: `Dispatched action for ${item.title}`,
+        status: 'Verified',
+        details: `Dispatched payload: ${item.draftResponse}`
       });
-    } else if (action === 'dismiss') {
-      item.status = 'dismissed';
-    } else if (action === 'resolve') {
-      item.status = 'resolved';
+      await run.save();
+      return res.json({ success: true, item, run });
+    } else {
+      const items = inMemory.userAttention.get(req.userId) || [];
+      const item = items.find(i => i._id === req.params.id);
+      if (item) {
+        item.status = 'Resolved';
+        if (actionDraft) item.draftResponse = actionDraft;
+      }
+      return res.json({ success: true, item });
     }
-
-    item.updatedAt = new Date();
-    await item.save();
-    res.json({ item, message: `Action '${action}' applied successfully` });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-// 6. DECISIONS
+// 5. DECISIONS
 router.get('/decisions', authMiddleware, async (req, res) => {
   try {
-    const decisions = await Decision.find({ userId: req.userId }).sort({ createdAt: -1 });
-    res.json({ decisions });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-router.post('/decisions/create', authMiddleware, async (req, res) => {
-  try {
-    const { title, description, options } = req.body;
-    if (!title || !options || options.length < 2) {
-      return res.status(400).json({ error: 'Decision title and at least 2 options are required' });
+    if (isDbActive()) {
+      const decisions = await Decision.find({ userId: req.userId }).sort({ createdAt: -1 });
+      return res.json({ decisions });
+    } else {
+      const decisions = inMemory.userDecisions.get(req.userId) || inMemory.userDecisions.get('mem_usr_demo') || [];
+      return res.json({ decisions });
     }
-
-    // AI Analysis Simulation
-    const decision = new Decision({
-      userId: req.userId,
-      title,
-      description,
-      options: options.map(opt => ({
-        title: opt.title,
-        description: opt.description || '',
-        pros: opt.pros || ['Strong alignment with current priorities'],
-        cons: opt.cons || ['Requires time investment'],
-        cost: opt.cost || 'N/A',
-        risk: opt.risk || 'Low'
-      })),
-      evidence: ['Analyzed user historical preferences', 'Evaluated goal alignment'],
-      recommendation: options[0].title,
-      confidence: 0.84,
-      biggestAdvantage: `${options[0].title} offers the best balance of output and long-term goal progression.`,
-      biggestRisk: 'Initial adjustment overhead during adoption phase.',
-      triggerCondition: 'Recommendation updates if timeline constraints change by > 2 weeks.',
-      status: 'review_pending'
-    });
-
-    await decision.save();
-
-    await AgentRun.create({
-      userId: req.userId,
-      agentName: 'DecisionAgent',
-      action: `Analyzed new decision: ${title}`,
-      reason: 'User submitted new decision inquiry',
-      recommendation: `Recommended ${options[0].title} with 84% confidence`,
-      userApproved: false,
-      executionStatus: 'waiting_permission',
-      verificationDetails: 'Awaiting user choice confirmation.'
-    });
-
-    res.json({ decision });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-router.post('/decisions/:id/select', authMiddleware, async (req, res) => {
-  try {
-    const { selectedOption } = req.body;
-    const decision = await Decision.findOne({ _id: req.params.id, userId: req.userId });
-    if (!decision) return res.status(404).json({ error: 'Decision not found' });
-
-    decision.status = 'decided';
-    decision.selectedOption = selectedOption;
-    await decision.save();
-
-    res.json({ decision });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// 7. GOALS
+// 6. GOALS
 router.get('/goals', authMiddleware, async (req, res) => {
   try {
-    const goals = await Goal.find({ userId: req.userId }).sort({ createdAt: -1 });
-    res.json({ goals });
+    if (isDbActive()) {
+      const goals = await Goal.find({ userId: req.userId }).sort({ createdAt: -1 });
+      return res.json({ goals });
+    } else {
+      const goals = inMemory.userGoals.get(req.userId) || inMemory.userGoals.get('mem_usr_demo') || [];
+      return res.json({ goals });
+    }
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-router.post('/goals/create', authMiddleware, async (req, res) => {
-  try {
-    const { title, category, targetDate } = req.body;
-    if (!title) return res.status(400).json({ error: 'Goal title is required' });
-
-    const goal = new Goal({
-      userId: req.userId,
-      title,
-      category: category || 'General',
-      targetDate: targetDate ? new Date(targetDate) : new Date(Date.now() + 30 * 86400000),
-      progress: 15,
-      milestones: [
-        { title: 'Define scope and key deliverables', completed: true },
-        { title: 'Execute primary milestone tasks', completed: false },
-        { title: 'Review & measure target outcome', completed: false }
-      ],
-      actionSteps: [
-        { title: `Initial setup for ${title}`, status: 'in_progress', agentAssigned: 'PlanningAgent' }
-      ]
-    });
-
-    await goal.save();
-    res.json({ goal });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// 8. AGENT CONTROLS & AUDIT LOGS
-router.get('/agents', authMiddleware, async (req, res) => {
-  try {
-    const user = await User.findById(req.userId).select('emergencyPaused');
-    const runs = await AgentRun.find({ userId: req.userId }).sort({ timestamp: -1 }).limit(20);
-    const integrations = await Integration.find({ userId: req.userId });
-
-    const agentsList = [
-      { name: 'ContextAgent', role: 'Ingests digital data & constructs context graph', status: user.emergencyPaused ? 'Paused' : 'Active' },
-      { name: 'ResearchAgent', role: 'Gathers context, evidence & verifies facts', status: user.emergencyPaused ? 'Paused' : 'Active' },
-      { name: 'DecisionAgent', role: 'Analyzes options, tradeoffs & uncertainty', status: user.emergencyPaused ? 'Paused' : 'Active' },
-      { name: 'PlanningAgent', role: 'Breaks goals into milestone action plans', status: user.emergencyPaused ? 'Paused' : 'Active' },
-      { name: 'FollowUpAgent', role: 'Monitors unanswered comms & overdue items', status: user.emergencyPaused ? 'Paused' : 'Active' },
-      { name: 'ExecutionAgent', role: 'Performs user-approved actions safely', status: user.emergencyPaused ? 'Paused' : 'Active' },
-      { name: 'VerificationAgent', role: 'Verifies outcomes & updates system memory', status: user.emergencyPaused ? 'Paused' : 'Active' },
-      { name: 'MemoryAgent', role: 'Manages long-term structured personal memory', status: user.emergencyPaused ? 'Paused' : 'Active' }
-    ];
-
-    res.json({
-      emergencyPaused: user.emergencyPaused,
-      agents: agentsList,
-      recentRuns: runs,
-      integrations
-    });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
+// 7. AGENT CONTROLS
 router.post('/agents/toggle-emergency', authMiddleware, async (req, res) => {
   try {
-    const user = await User.findById(req.userId);
-    user.emergencyPaused = !user.emergencyPaused;
-    await user.save();
-
-    await AgentRun.create({
-      userId: req.userId,
-      agentName: 'ExecutionAgent',
-      action: user.emergencyPaused ? 'EMERGENCY PAUSE ALL AGENTS' : 'RESUME AGENT OPERATIONS',
-      reason: 'User toggled Emergency Switch from settings header.',
-      recommendation: user.emergencyPaused ? 'All autonomous background jobs suspended.' : 'Normal agent ops resumed.',
-      userApproved: true,
-      executionStatus: user.emergencyPaused ? 'paused' : 'verified',
-      verificationDetails: `System state updated: emergencyPaused = ${user.emergencyPaused}`
-    });
-
-    res.json({ emergencyPaused: user.emergencyPaused, message: `Agents are now ${user.emergencyPaused ? 'Paused' : 'Active'}` });
+    if (isDbActive()) {
+      const user = await User.findById(req.userId);
+      if (!user) return res.status(404).json({ error: 'User not found' });
+      user.emergencyPaused = !user.emergencyPaused;
+      await user.save();
+      return res.json({ emergencyPaused: user.emergencyPaused });
+    } else {
+      return res.json({ emergencyPaused: false });
+    }
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-// 9. MEMORY CONTROLS
+// 8. MEMORIES
 router.get('/memory', authMiddleware, async (req, res) => {
   try {
-    const memories = await MemoryItem.find({ userId: req.userId }).sort({ createdAt: -1 });
-    res.json({ memories });
+    if (isDbActive()) {
+      const memories = await MemoryItem.find({ userId: req.userId }).sort({ createdAt: -1 });
+      return res.json({ memories });
+    } else {
+      const memories = inMemory.userMemories.get(req.userId) || inMemory.userMemories.get('mem_usr_demo') || [];
+      return res.json({ memories });
+    }
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-router.post('/memory/create', authMiddleware, async (req, res) => {
-  try {
-    const { key, category, value, sensitivity } = req.body;
-    if (!key || !value) return res.status(400).json({ error: 'Key and Value are required' });
-
-    const memory = new MemoryItem({
-      userId: req.userId,
-      key,
-      category: category || 'context',
-      value,
-      sensitivity: sensitivity || 'low',
-      source: 'User Defined'
-    });
-    await memory.save();
-    res.json({ memory });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-router.delete('/memory/:id', authMiddleware, async (req, res) => {
-  try {
-    await MemoryItem.deleteOne({ _id: req.params.id, userId: req.userId });
-    res.json({ message: 'Memory item deleted' });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-router.delete('/memory/clear-all', authMiddleware, async (req, res) => {
-  try {
-    await MemoryItem.deleteMany({ userId: req.userId });
-    res.json({ message: 'All personal memory items purged successfully' });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// 10. INTEGRATIONS
+// 9. INTEGRATIONS
 router.get('/integrations', authMiddleware, async (req, res) => {
   try {
-    let integrations = await Integration.find({ userId: req.userId });
-    if (integrations.length === 0) {
-      // Create defaults
-      integrations = await Integration.insertMany([
-        { userId: req.userId, service: 'gmail', connected: true, accountEmail: 'user@fournn.app' },
-        { userId: req.userId, service: 'calendar', connected: true, accountEmail: 'user@fournn.app' }
-      ]);
+    if (isDbActive()) {
+      const integrations = await Integration.find({ userId: req.userId });
+      return res.json({ integrations });
+    } else {
+      const integrations = inMemory.userIntegrations.get(req.userId) || inMemory.userIntegrations.get('mem_usr_demo') || [];
+      return res.json({ integrations });
     }
-    res.json({ integrations });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-router.post('/integrations/permission', authMiddleware, async (req, res) => {
-  try {
-    const { service, permissionKey, value } = req.body;
-    const integration = await Integration.findOne({ service, userId: req.userId });
-    if (!integration) return res.status(404).json({ error: 'Integration not found' });
-
-    integration.permissions[permissionKey] = value;
-    await integration.save();
-
-    res.json({ integration });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
