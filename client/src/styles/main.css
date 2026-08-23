@@ -40,6 +40,98 @@
   --sidebar-width: 260px;
 }
 
+/* Light Theme Overrides */
+body.light-theme {
+  --bg-dark: #f8fafc;
+  --bg-card: #ffffff;
+  --bg-card-hover: #f1f5f9;
+  --bg-surface: #f1f5f9;
+  --border-color: #e2e8f0;
+  --border-accent: #cbd5e1;
+  
+  --primary-accent: #d97706;
+  --primary-accent-glow: rgba(217, 119, 6, 0.2);
+  --primary-accent-hover: #b45309;
+  
+  --gold-light: #fef3c7;
+  --gold-main: #d97706;
+  --gold-dark: #92400e;
+  
+  --emerald-accent: #059669;
+  --amber-accent: #d97706;
+  --crimson-accent: #dc2626;
+  
+  --text-main: #0f172a;
+  --text-muted: #475569;
+  --text-dim: #64748b;
+}
+
+body.light-theme .app-container {
+  background: var(--bg-dark);
+}
+
+body.light-theme .sidebar {
+  background: #ffffff;
+  border-right: 1px solid var(--border-color);
+}
+
+body.light-theme .navbar {
+  background: rgba(255, 255, 255, 0.92);
+  border-bottom: 1px solid var(--border-color);
+}
+
+body.light-theme h1, 
+body.light-theme h2, 
+body.light-theme h3, 
+body.light-theme h4, 
+body.light-theme h5, 
+body.light-theme h6 {
+  color: #0f172a;
+}
+
+body.light-theme .nav-brand {
+  color: #0f172a;
+}
+
+body.light-theme .nav-item {
+  color: #475569;
+}
+
+body.light-theme .nav-item:hover {
+  color: #0f172a;
+  background: rgba(0, 0, 0, 0.04);
+}
+
+body.light-theme .nav-item.active {
+  color: #d97706;
+  background: linear-gradient(90deg, rgba(217, 119, 6, 0.12) 0%, rgba(217, 119, 6, 0.02) 100%);
+  border-left: 4px solid #d97706;
+}
+
+body.light-theme .btn-secondary {
+  background: #f1f5f9;
+  color: #0f172a;
+  border: 1px solid #cbd5e1;
+}
+
+body.light-theme .btn-secondary:hover {
+  background: #e2e8f0;
+  border-color: #94a3b8;
+}
+
+body.light-theme .form-input, 
+body.light-theme .form-textarea, 
+body.light-theme .form-select {
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  color: #0f172a;
+}
+
+body.light-theme .graph-container {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+}
+
 * {
   box-sizing: border-box;
   margin: 0;
@@ -55,13 +147,14 @@ body {
   line-height: 1.65;
   font-size: 1rem;
   overflow-x: hidden;
+  transition: background-color var(--transition-normal), color var(--transition-normal);
 }
 
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-heading);
   letter-spacing: -0.015em;
   font-weight: 700;
-  color: #f8fafc;
+  color: var(--text-main);
 }
 
 h1 { font-size: clamp(2.2rem, 4.5vw, 3.2rem); }
@@ -134,7 +227,7 @@ a {
 
 @media (max-width: 768px) {
   .navbar {
-    padding: 0 1.25rem;
+    padding: 0 1.15rem;
   }
 }
 
@@ -145,7 +238,7 @@ a {
   font-family: var(--font-heading);
   font-size: 1.55rem;
   font-weight: 700;
-  color: #f8fafc;
+  color: var(--text-main);
 }
 
 .brand-icon {
@@ -251,7 +344,7 @@ a {
 }
 
 .nav-item:hover {
-  color: #f8fafc;
+  color: var(--text-main);
   background: rgba(255, 255, 255, 0.05);
 }
 
@@ -359,7 +452,7 @@ a {
   font-weight: 700;
   line-height: 1;
   margin-top: 0.4rem;
-  color: #f8fafc;
+  color: var(--text-main);
 }
 
 .metric-icon {
@@ -405,7 +498,7 @@ a {
 
 .btn-secondary {
   background: rgba(255, 255, 255, 0.05);
-  color: #f8fafc;
+  color: var(--text-main);
   border: 1px solid var(--border-color);
 }
 
@@ -468,7 +561,7 @@ a {
 }
 
 .tab-btn:hover {
-  color: #f8fafc;
+  color: var(--text-main);
 }
 
 .tab-btn.active {
@@ -520,7 +613,7 @@ a {
   background: var(--bg-surface);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-sm);
-  color: #f8fafc;
+  color: var(--text-main);
   font-family: var(--font-body);
   font-size: 0.98rem;
   outline: none;
@@ -544,7 +637,7 @@ a {
   font-size: clamp(3rem, 6vw, 4.8rem);
   line-height: 1.1;
   margin-bottom: 1.75rem;
-  color: #f8fafc;
+  color: var(--text-main);
 }
 
 @media (max-width: 768px) {

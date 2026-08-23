@@ -1,6 +1,6 @@
 import React from 'react';
 import { useAuth } from '../../contexts/AuthContext';
-import { ShieldAlert, ShieldCheck, Menu, User as UserIcon } from 'lucide-react';
+import { ShieldAlert, ShieldCheck, Menu, User as UserIcon, Sun, Moon } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
 
 const PAGE_TITLES = {
@@ -16,7 +16,7 @@ const PAGE_TITLES = {
 };
 
 export default function Navbar({ onToggleSidebar }) {
-  const { user, toggleEmergencyPause } = useAuth();
+  const { user, toggleEmergencyPause, theme, toggleTheme } = useAuth();
   const location = useLocation();
 
   const pageTitle = PAGE_TITLES[location.pathname] || 'Fournn OS';
@@ -38,47 +38,60 @@ export default function Navbar({ onToggleSidebar }) {
         </h2>
       </div>
 
-      {user && (
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
-          <button
-            onClick={toggleEmergencyPause}
-            className={`emergency-btn ${user.emergencyPaused ? 'paused' : 'active'}`}
-            title="Click to freeze all autonomous background agents"
-          >
-            {user.emergencyPaused ? (
-              <>
-                <ShieldAlert size={16} />
-                <span>AGENTS PAUSED</span>
-              </>
-            ) : (
-              <>
-                <ShieldCheck size={16} />
-                <span>AGENTS ACTIVE</span>
-              </>
-            )}
-          </button>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+        {/* Sun / Moon Theme Toggle Button */}
+        <button
+          onClick={toggleTheme}
+          className="btn btn-secondary btn-sm"
+          style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', padding: '0.45rem 0.85rem' }}
+          title={`Switch to ${theme === 'dark' ? 'Light' : 'Dark'} Mode`}
+        >
+          {theme === 'dark' ? <Sun size={16} color="var(--gold-main)" /> : <Moon size={16} color="var(--primary-accent)" />}
+          <span style={{ fontSize: '0.82rem', fontWeight: 600 }}>{theme === 'dark' ? 'Light' : 'Dark'}</span>
+        </button>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', fontSize: '0.92rem' }}>
-            <div
-              style={{
-                width: 38,
-                height: 38,
-                borderRadius: '50%',
-                background: 'var(--bg-surface)',
-                border: '1px solid var(--border-accent)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: 'var(--gold-main)',
-                fontWeight: 700
-              }}
+        {user && (
+          <>
+            <button
+              onClick={toggleEmergencyPause}
+              className={`emergency-btn ${user.emergencyPaused ? 'paused' : 'active'}`}
+              title="Click to freeze all autonomous background agents"
             >
-              {user.name ? user.name[0].toUpperCase() : <UserIcon size={18} />}
+              {user.emergencyPaused ? (
+                <>
+                  <ShieldAlert size={16} />
+                  <span>AGENTS PAUSED</span>
+                </>
+              ) : (
+                <>
+                  <ShieldCheck size={16} />
+                  <span>AGENTS ACTIVE</span>
+                </>
+              )}
+            </button>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', fontSize: '0.92rem' }}>
+              <div
+                style={{
+                  width: 38,
+                  height: 38,
+                  borderRadius: '50%',
+                  background: 'var(--bg-surface)',
+                  border: '1px solid var(--border-accent)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: 'var(--gold-main)',
+                  fontWeight: 700
+                }}
+              >
+                {user.name ? user.name[0].toUpperCase() : <UserIcon size={18} />}
+              </div>
+              <span style={{ fontWeight: 600, color: 'var(--text-main)' }}>{user.name}</span>
             </div>
-            <span style={{ fontWeight: 600, color: 'var(--text-main)' }}>{user.name}</span>
-          </div>
-        </div>
-      )}
+          </>
+        )}
+      </div>
     </header>
   );
 }

@@ -6,6 +6,22 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(localStorage.getItem('fournn_token') || '');
   const [loading, setLoading] = useState(true);
+  
+  // Theme state: default to localStorage or 'dark'
+  const [theme, setTheme] = useState(localStorage.getItem('fournn_theme') || 'dark');
+
+  useEffect(() => {
+    if (theme === 'light') {
+      document.body.classList.add('light-theme');
+    } else {
+      document.body.classList.remove('light-theme');
+    }
+    localStorage.setItem('fournn_theme', theme);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme(prev => prev === 'dark' ? 'light' : 'dark');
+  };
 
   useEffect(() => {
     if (token) {
@@ -81,7 +97,19 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, loading, login, register, demoLogin, logout, toggleEmergencyPause, setUser }}>
+    <AuthContext.Provider value={{ 
+      user, 
+      token, 
+      loading, 
+      theme, 
+      toggleTheme, 
+      login, 
+      register, 
+      demoLogin, 
+      logout, 
+      toggleEmergencyPause, 
+      setUser 
+    }}>
       {children}
     </AuthContext.Provider>
   );

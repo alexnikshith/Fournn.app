@@ -22,11 +22,13 @@ import {
   ShieldAlert,
   HelpCircle,
   FileCheck,
-  TrendingUp
+  TrendingUp,
+  Sun,
+  Moon
 } from 'lucide-react';
 
 export default function LandingPage() {
-  const { demoLogin } = useAuth();
+  const { demoLogin, theme, toggleTheme } = useAuth();
   const navigate = useNavigate();
   const [activeFaq, setActiveFaq] = useState(null);
   const [activeDemoStep, setActiveDemoStep] = useState(0);
@@ -129,19 +131,29 @@ export default function LandingPage() {
         />
 
         <div style={{ position: 'relative', zIndex: 1 }}>
-          <div 
-            className="badge" 
-            style={{ 
-              background: 'rgba(245, 158, 11, 0.12)', 
-              color: 'var(--gold-main)', 
-              borderColor: 'rgba(245, 158, 11, 0.35)',
-              marginBottom: '2rem',
-              padding: '0.5rem 1.25rem',
-              fontSize: '0.85rem'
-            }}
-          >
-            <Sparkles size={16} />
-            <span>AI PERSONAL OPERATING SYSTEM</span>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '1rem', marginBottom: '2rem', flexWrap: 'wrap' }}>
+            <div 
+              className="badge" 
+              style={{ 
+                background: 'rgba(245, 158, 11, 0.12)', 
+                color: 'var(--gold-main)', 
+                borderColor: 'rgba(245, 158, 11, 0.35)',
+                padding: '0.5rem 1.25rem',
+                fontSize: '0.85rem'
+              }}
+            >
+              <Sparkles size={16} />
+              <span>AI PERSONAL OPERATING SYSTEM</span>
+            </div>
+
+            <button
+              onClick={toggleTheme}
+              className="btn btn-secondary btn-sm"
+              style={{ padding: '0.4rem 0.95rem', fontSize: '0.85rem' }}
+            >
+              {theme === 'dark' ? <Sun size={16} color="var(--gold-main)" /> : <Moon size={16} color="var(--primary-accent)" />}
+              <span>{theme === 'dark' ? 'Light Theme' : 'Dark Theme'}</span>
+            </button>
           </div>
 
           <h1 className="hero-title">
