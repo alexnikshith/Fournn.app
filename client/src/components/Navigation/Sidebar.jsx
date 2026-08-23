@@ -54,7 +54,12 @@ export default function Sidebar({ isOpen, onClose }) {
             <NavLink
               key={item.path}
               to={item.path}
-              onClick={onClose}
+              onClick={() => {
+                // Only auto-close on mobile screens (< 768px)
+                if (window.innerWidth <= 768 && onClose) {
+                  onClose();
+                }
+              }}
               className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
             >
               <Icon size={18} />
