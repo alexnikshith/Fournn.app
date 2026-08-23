@@ -349,7 +349,7 @@ router.get('/memory', authMiddleware, async (req, res) => {
   }
 });
 
-// 9. INTEGRATIONS
+// 9. INTEGRATIONS & EMAIL INGESTION
 router.get('/integrations', authMiddleware, async (req, res) => {
   try {
     if (isDbActive()) {
@@ -358,6 +358,92 @@ router.get('/integrations', authMiddleware, async (req, res) => {
     } else {
       const integrations = inMemory.userIntegrations.get(req.userId) || inMemory.userIntegrations.get('mem_usr_demo') || [];
       return res.json({ integrations });
+    }
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Clear sample demo data
+router.post('/demo/clear', authMiddleware, async (req, res) => {
+  try {
+    if (isDbActive()) {
+      await AttentionItem.deleteMany({ userId: req.userId });
+      await Decision.deleteMany({ userId: req.userId });
+      await Goal.deleteMany({ userId: req.userId });
+      await Node.deleteMany({ userId: req.userId });
+      await Edge.deleteMany({ userId: req.userId });
+      await MemoryItem.deleteMany({ userId: req.userId });
+    } else {
+      inMemory.clearInMemoryUser(req.userId);
+    }
+    return res.json({ success: true, message: 'All demo data cleared successfully.' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Real Email Ingestion Endpoint
+router.post('/integrations/ingest-email', authMiddleware, async (req, res) => {
+  try {
+    const { subject, sender, body, category } = req.body;
+    if (!subject) {
+      return res.status(400).json({ error: 'Email subject is required' });
+    }
+
+    const title = subject;
+    const summary = body || `Email from ${sender || 'Unknown Sender'}: ${subject}`;
+    const priority = subject.toLowerCase().includes('urgent') || subject.toLowerCase().includes('placement') || subject.toLowerCase().includes('connect') ? 'Urgent' : 'Important';
+
+    if (isDbActive()) {
+      const item = new AttentionItem({
+        userId: req.userId,
+        title,
+        category: category || 'Career',
+        priority,
+        status: 'Pending Review',
+        summary,
+        proposedAction: `Acknowledge email and set reminder for ${subject}`,
+        draftResponse: `Thank you for sharing the updates regarding ${subject}. I have noted the details.`,
+        evidence: [sender ? `Sender: ${sender}` : 'Gmail Inbox Stream']
+      });
+      await item.save();
+
+      // Create Graph Node
+      const node = new Node({
+        userId: req.userId,
+        nodeId: 'email_' + Date.now(),
+        label: title,
+        category: 'Email',
+        details: summary
+      });
+      await node.save();
+
+      return res.json({ success: true, item, node });
+    } else {
+      const items = inMemory.userAttention.get(req.userId) || [];
+      const newItem = {
+        _id: 'att_real_' + Date.now(),
+        title,
+        category: category || 'Career',
+        priority,
+        status: 'Pending Review',
+        summary,
+        proposedAction: `Acknowledge email and set reminder for ${subject}`,
+        draftResponse: `Thank you for sharing the updates regarding ${subject}. I have noted the details.`,
+        evidence: [sender ? `Sender: ${sender}` : 'Gmail Inbox Stream']
+      };
+      items.unshift(newItem);
+      inMemory.userAttention.set(req.userId, items);
+
+      // Add to graph
+      const graph = inMemory.userGraphs.get(req.userId) || { nodes: [], edges: [] };
+      const newNodeId = 'node_' + Date.now();
+      graph.nodes.push({ id: newNodeId, label: title, category: 'Email', details: summary });
+      graph.edges.push({ id: 'edge_' + Date.now(), source: 'usr_1', target: newNodeId, label: 'received' });
+      inMemory.userGraphs.set(req.userId, graph);
+
+      return res.json({ success: true, item: newItem });
     }
   } catch (err) {
     res.status(500).json({ error: err.message });

@@ -121,6 +121,14 @@ function seedInMemoryUser(userId, name, email) {
   ]);
 }
 
+function clearInMemoryUser(userId) {
+  userGraphs.set(userId, { nodes: [], edges: [] });
+  userAttention.set(userId, []);
+  userDecisions.set(userId, []);
+  userGoals.set(userId, []);
+  userMemories.set(userId, []);
+}
+
 module.exports = {
   users,
   userGraphs,
@@ -130,5 +138,6 @@ module.exports = {
   userAgents,
   userMemories,
   userIntegrations,
-  seedInMemoryUser
+  seedInMemoryUser,
+  clearInMemoryUser
 };
