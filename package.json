@@ -1,0 +1,20 @@
+{
+  "name": "fournn-app",
+  "version": "1.0.0",
+  "description": "Fournn — AI Personal Operating System",
+  "main": "server/src/server.js",
+  "scripts": {
+    "setup": "cd server && npm install && cd ../client && npm install",
+    "server": "cd server && npm run dev",
+    "client": "cd client && npm run dev",
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "build": "cd client && npm run build",
+    "start": "cd server && npm start"
+  },
+  "keywords": ["ai", "personal-os", "context-graph", "mern"],
+  "author": "Fournn Team",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
