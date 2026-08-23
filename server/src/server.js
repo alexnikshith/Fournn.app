@@ -45,8 +45,9 @@ app.use(async (req, res, next) => {
   next();
 });
 
-// API Routes
+// API Routes (Mounted on both /api and / for Vercel serverless compatibility)
 app.use('/api', apiRoutes);
+app.use('/', apiRoutes);
 
 // Global Error Handler Guaranteeing Always Valid JSON Responses
 app.use((err, req, res, next) => {
