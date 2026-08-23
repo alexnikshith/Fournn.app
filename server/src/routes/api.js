@@ -13,6 +13,16 @@ const { authMiddleware, JWT_SECRET } = require('../middleware/auth');
 const { seedDemoData } = require('../services/demoSeeder');
 const AgentEngine = require('../agents/AgentEngine');
 
+const checkDbConnection = async () => {
+  if (mongoose.connection.readyState !== 1 && process.env.MONGODB_URI) {
+    try {
+      await mongoose.connect(process.env.MONGODB_URI, { serverSelectionTimeoutMS: 4000 });
+    } catch (e) {
+      console.error('Failed on-demand DB connect:', e.message);
+    }
+  }
+};
+
 // 1. AUTH ROUTES
 router.post('/auth/register', async (req, res) => {
   try {
@@ -20,6 +30,8 @@ router.post('/auth/register', async (req, res) => {
     if (!name || !email || !password) {
       return res.status(400).json({ error: 'Name, email, and password are required' });
     }
+
+    await checkDbConnection();
 
     const existingUser = await User.findOne({ email: email.toLowerCase() });
     if (existingUser) {
@@ -45,6 +57,9 @@ router.post('/auth/register', async (req, res) => {
       }
     });
   } catch (err) {
+    if (err.message.includes('buffering') || err.message.includes('connection')) {
+      return res.status(503).json({ error: 'Database connection is still initializing. Please retry in 5 seconds.' });
+    }
     res.status(500).json({ error: err.message });
   }
 });
@@ -56,8 +71,12 @@ router.post('/auth/login', async (req, res) => {
       return res.status(400).json({ error: 'Email and password are required' });
     }
 
+    await checkDbConnection();
+
     const user = await User.findOne({ email: email.toLowerCase() });
     if (!user) {
+      return res.status(401).json({ error: 'Invalid email or password' });
+    }
       return res.status(401).json({ error: 'Invalid email or password' });
     }
 
