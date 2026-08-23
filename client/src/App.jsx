@@ -3,6 +3,7 @@ import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from './contexts/AuthContext';
 import Navbar from './components/Navigation/Navbar';
 import Sidebar from './components/Navigation/Sidebar';
+import ErrorBoundary from './components/ErrorBoundary';
 
 import LandingPage from './pages/LandingPage';
 import AuthPage from './pages/AuthPage';
@@ -22,7 +23,14 @@ function ProtectedLayout({ children }) {
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
   if (loading) {
-    return <div style={{ padding: '3rem', textAlign: 'center', color: 'var(--text-muted)' }}>Loading Fournn...</div>;
+    return (
+      <div style={{ background: 'var(--bg-dark)', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)' }}>
+        <div style={{ textAlign: 'center' }}>
+          <div className="brand-icon" style={{ margin: '0 auto 1rem', width: 44, height: 44 }}>✨</div>
+          <div>Loading Fournn...</div>
+        </div>
+      </div>
+    );
   }
 
   if (!user) {
@@ -35,7 +43,9 @@ function ProtectedLayout({ children }) {
       <div className={`main-content ${sidebarOpen ? '' : 'sidebar-collapsed'}`}>
         <Navbar onToggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
         <main className="page-body">
-          {children}
+          <ErrorBoundary>
+            {children}
+          </ErrorBoundary>
         </main>
       </div>
     </div>
@@ -52,47 +62,52 @@ function GraphPageWrapper() {
     if (token) {
       fetch('/api/graph', { headers: { Authorization: `Bearer ${token}` } })
         .then(res => res.json())
-        .then(data => setGraphData(data))
+        .then(data => {
+          if (data && data.nodes) setGraphData(data);
+        })
         .catch(err => console.error(err))
         .finally(() => setLoading(false));
     }
   }, [token]);
 
   return (
-    <div>
+    <div style={{ width: '100%' }}>
       <div style={{ marginBottom: '2rem' }}>
-        <h1 style={{ fontSize: '2rem', fontWeight: 800 }}>Personal Context Graph</h1>
-        <p style={{ color: 'var(--text-muted)' }}>
-          Interactive map of entities, relationships, commitments, and goals across your digital life.
+        <h1 style={{ fontSize: '2.2rem', fontWeight: 700, marginBottom: '0.5rem' }}>
+          Personal Context Graph Explorer
+        </h1>
+        <p style={{ color: 'var(--text-muted)', fontSize: '1.05rem' }}>
+          Interactive visualization of relationships between people, companies, events, goals, and decisions.
         </p>
       </div>
-      {loading ? (
-        <div style={{ padding: '3rem', textAlign: 'center', color: 'var(--text-muted)' }}>Rendering context graph...</div>
-      ) : (
-        <InteractiveGraph nodes={graphData.nodes} edges={graphData.edges} />
-      )}
+      <InteractiveGraph graphData={graphData} />
     </div>
   );
 }
 
 export default function App() {
   return (
-    <Routes>
-      <Route path="/" element={<LandingPage />} />
-      <Route path="/auth" element={<AuthPage />} />
-      <Route path="/onboarding" element={<OnboardingPage />} />
+    <ErrorBoundary>
+      <Routes>
+        {/* Public Routes */}
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/auth" element={<AuthPage />} />
 
-      <Route path="/dashboard" element={<ProtectedLayout><DashboardPage /></ProtectedLayout>} />
-      <Route path="/graph" element={<ProtectedLayout><GraphPageWrapper /></ProtectedLayout>} />
-      <Route path="/attention" element={<ProtectedLayout><AttentionPage /></ProtectedLayout>} />
-      <Route path="/decisions" element={<ProtectedLayout><DecisionPage /></ProtectedLayout>} />
-      <Route path="/goals" element={<ProtectedLayout><GoalsPage /></ProtectedLayout>} />
-      <Route path="/agents" element={<ProtectedLayout><AgentsPage /></ProtectedLayout>} />
-      <Route path="/activity" element={<ProtectedLayout><ActivityPage /></ProtectedLayout>} />
-      <Route path="/memory" element={<ProtectedLayout><MemoryPage /></ProtectedLayout>} />
-      <Route path="/integrations" element={<ProtectedLayout><IntegrationsSettingsPage /></ProtectedLayout>} />
+        {/* Protected App Routes */}
+        <Route path="/onboarding" element={<ProtectedLayout><OnboardingPage /></ProtectedLayout>} />
+        <Route path="/dashboard" element={<ProtectedLayout><DashboardPage /></ProtectedLayout>} />
+        <Route path="/graph" element={<ProtectedLayout><GraphPageWrapper /></ProtectedLayout>} />
+        <Route path="/attention" element={<ProtectedLayout><AttentionPage /></ProtectedLayout>} />
+        <Route path="/decisions" element={<ProtectedLayout><DecisionPage /></ProtectedLayout>} />
+        <Route path="/goals" element={<ProtectedLayout><GoalsPage /></ProtectedLayout>} />
+        <Route path="/agents" element={<ProtectedLayout><AgentsPage /></ProtectedLayout>} />
+        <Route path="/activity" element={<ProtectedLayout><ActivityPage /></ProtectedLayout>} />
+        <Route path="/memory" element={<ProtectedLayout><MemoryPage /></ProtectedLayout>} />
+        <Route path="/integrations" element={<ProtectedLayout><IntegrationsSettingsPage /></ProtectedLayout>} />
 
-      <Route path="*" element={<Navigate to="/" replace />} />
-    </Routes>
+        {/* Catch-all fallback */}
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </ErrorBoundary>
   );
 }
