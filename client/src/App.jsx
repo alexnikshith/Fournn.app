@@ -19,7 +19,7 @@ import IntegrationsSettingsPage from './pages/IntegrationsSettingsPage';
 
 function ProtectedLayout({ children }) {
   const { user, loading } = useAuth();
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
 
   if (loading) {
     return <div style={{ padding: '3rem', textAlign: 'center', color: 'var(--text-muted)' }}>Loading Fournn...</div>;
@@ -32,7 +32,7 @@ function ProtectedLayout({ children }) {
   return (
     <div className="app-container">
       <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-      <div className="main-content">
+      <div className={`main-content ${sidebarOpen ? '' : 'sidebar-collapsed'}`}>
         <Navbar onToggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
         <main className="page-body">
           {children}
