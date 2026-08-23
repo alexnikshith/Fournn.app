@@ -258,5 +258,7 @@ app.use((req, res) => {
   res.status(404).json({ error: 'Endpoint not found', path: req.path });
 });
 
-// Export serverless handler
-module.exports = app;
+// Export serverless handler for Vercel
+module.exports = (req, res) => {
+  return app(req, res);
+};
