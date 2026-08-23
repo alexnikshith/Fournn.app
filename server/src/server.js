@@ -10,83 +10,68 @@ const PORT = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
-// Synchronous Connection Manager for Serverless & Standalone Execution
-let cachedDb = null;
-let connectionPromise = null;
+// Serverless DB Connection Manager
+let isConnected = false;
 
 async function connectDB() {
-  if (mongoose.connection.readyState === 1) {
-    return mongoose.connection;
-  }
-
-  if (connectionPromise) {
-    return connectionPromise;
+  if (isConnected && mongoose.connection.readyState === 1) {
+    return;
   }
 
   const mongoUri = process.env.MONGODB_URI;
 
-  connectionPromise = (async () => {
-    if (mongoUri && mongoUri.trim().length > 0) {
-      try {
-        console.log('Connecting to MongoDB Atlas...');
-        await mongoose.connect(mongoUri, {
-          serverSelectionTimeoutMS: 5000,
-          connectTimeoutMS: 5000
-        });
-        console.log('MongoDB Atlas connected successfully.');
-        return mongoose.connection;
-      } catch (err) {
-        console.error('MongoDB Atlas connection error:', err.message);
-      }
-    }
-
-    // Fallback: Local / Memory Server (for non-Vercel local dev)
-    if (!process.env.VERCEL) {
-      try {
-        const { MongoMemoryServer } = require('mongodb-memory-server');
-        const mongod = await MongoMemoryServer.create();
-        const memoryUri = mongod.getUri();
-        await mongoose.connect(memoryUri);
-        console.log('Connected to In-Memory MongoDB at:', memoryUri);
-        return mongoose.connection;
-      } catch (memErr) {
-        console.error('In-memory DB fallback failed:', memErr.message);
-      }
-    }
-
-    // Secondary fallback: Local MongoDB
+  if (mongoUri && mongoUri.trim().length > 0) {
     try {
-      await mongoose.connect('mongodb://127.0.0.1:27017/fournn', { serverSelectionTimeoutMS: 2000 });
-      console.log('Connected to local MongoDB.');
-      return mongoose.connection;
-    } catch (localErr) {
-      console.error('Local MongoDB connection failed.');
+      await mongoose.connect(mongoUri, {
+        serverSelectionTimeoutMS: 5000,
+        connectTimeoutMS: 5000
+      });
+      isConnected = true;
+      console.log('Connected to MongoDB Atlas.');
+      return;
+    } catch (err) {
+      console.error('MongoDB Atlas connection failed:', err.message);
     }
-  })();
+  }
 
-  try {
-    cachedDb = await connectionPromise;
-    return cachedDb;
-  } finally {
-    connectionPromise = null;
+  // Only attempt MongoMemoryServer in local development (Never in Vercel Serverless environment)
+  if (!process.env.VERCEL) {
+    try {
+      const { MongoMemoryServer } = require('mongodb-memory-server');
+      const mongod = await MongoMemoryServer.create();
+      const memoryUri = mongod.getUri();
+      await mongoose.connect(memoryUri);
+      isConnected = true;
+      console.log('Connected to local MongoMemoryServer at:', memoryUri);
+      return;
+    } catch (memErr) {
+      console.error('MongoMemoryServer fallback failed:', memErr.message);
+    }
   }
 }
 
-// Guaranteed DB Connection Middleware BEFORE processing any request
+// DB Middleware
 app.use(async (req, res, next) => {
   try {
     await connectDB();
-    next();
   } catch (err) {
-    console.error('Database connection middleware error:', err.message);
-    next();
+    console.error('DB Connection Middleware error:', err.message);
   }
+  next();
 });
 
 // API Routes
 app.use('/api', apiRoutes);
 
-if (process.env.NODE_ENV !== 'production' || !process.env.VERCEL) {
+// Global Error Handler Guaranteeing Always Valid JSON Responses
+app.use((err, req, res, next) => {
+  console.error('Server Uncaught Error:', err);
+  res.status(500).json({ 
+    error: err.message || 'An internal server error occurred. Please try again.' 
+  });
+});
+
+if (!process.env.VERCEL) {
   app.listen(PORT, () => {
     console.log(`Fournn API Server running on port ${PORT}`);
   });

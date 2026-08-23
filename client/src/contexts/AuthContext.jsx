@@ -2,12 +2,22 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 
 const AuthContext = createContext();
 
+const parseJsonResponse = async (res) => {
+  const text = await res.text();
+  try {
+    return JSON.parse(text);
+  } catch (err) {
+    if (!res.ok) {
+      throw new Error(`Server Error (${res.status}): Please check your MONGODB_URI environment variable on Vercel.`);
+    }
+    throw new Error('Received unexpected response format from server.');
+  }
+};
+
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(localStorage.getItem('fournn_token') || '');
   const [loading, setLoading] = useState(true);
-  
-  // Theme state: default to localStorage or 'dark'
   const [theme, setTheme] = useState(localStorage.getItem('fournn_theme') || 'dark');
 
   useEffect(() => {
@@ -28,7 +38,7 @@ export const AuthProvider = ({ children }) => {
       fetch('/api/auth/me', {
         headers: { Authorization: `Bearer ${token}` }
       })
-        .then(res => res.json())
+        .then(res => parseJsonResponse(res))
         .then(data => {
           if (data.user) {
             setUser(data.user);
@@ -49,7 +59,7 @@ export const AuthProvider = ({ children }) => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password })
     });
-    const data = await res.json();
+    const data = await parseJsonResponse(res);
     if (!res.ok) throw new Error(data.error || 'Login failed');
     localStorage.setItem('fournn_token', data.token);
     setToken(data.token);
@@ -63,7 +73,7 @@ export const AuthProvider = ({ children }) => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name, email, password })
     });
-    const data = await res.json();
+    const data = await parseJsonResponse(res);
     if (!res.ok) throw new Error(data.error || 'Registration failed');
     localStorage.setItem('fournn_token', data.token);
     setToken(data.token);
@@ -85,15 +95,19 @@ export const AuthProvider = ({ children }) => {
 
   const toggleEmergencyPause = async () => {
     if (!token) return;
-    const res = await fetch('/api/agents/toggle-emergency', {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${token}` }
-    });
-    const data = await res.json();
-    if (res.ok && user) {
-      setUser({ ...user, emergencyPaused: data.emergencyPaused });
+    try {
+      const res = await fetch('/api/agents/toggle-emergency', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const data = await parseJsonResponse(res);
+      if (res.ok && user) {
+        setUser({ ...user, emergencyPaused: data.emergencyPaused });
+      }
+      return data;
+    } catch (err) {
+      console.error(err);
     }
-    return data;
   };
 
   return (
