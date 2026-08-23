@@ -1,3 +1,4 @@
+// Fournn AI OS AuthContext - Build v1.0.1 Cache-Buster
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
 const AuthContext = createContext();
