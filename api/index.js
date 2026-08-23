@@ -101,8 +101,13 @@ const authMiddleware = (req, res, next) => {
   }
 };
 
+// Health Check
+app.get(['/api/health', '/health'], (req, res) => {
+  res.json({ status: 'ok', serverless: true, timestamp: new Date() });
+});
+
 // 1. AUTH
-app.post('/api/auth/register', (req, res) => {
+app.post(['/api/auth/register', '/auth/register'], (req, res) => {
   const { name, email, password } = req.body;
   if (!email || !password) return res.status(400).json({ error: 'Email and password required' });
   const cleanEmail = email.toLowerCase();
@@ -116,7 +121,7 @@ app.post('/api/auth/register', (req, res) => {
   res.json({ token, user });
 });
 
-app.post('/api/auth/login', (req, res) => {
+app.post(['/api/auth/login', '/auth/login'], (req, res) => {
   const { email } = req.body;
   if (!email) return res.status(400).json({ error: 'Email required' });
   const cleanEmail = email.toLowerCase();
@@ -133,7 +138,7 @@ app.post('/api/auth/login', (req, res) => {
   res.json({ token, user });
 });
 
-app.get('/api/auth/me', authMiddleware, (req, res) => {
+app.get(['/api/auth/me', '/auth/me'], authMiddleware, (req, res) => {
   const user = { id: req.userId, name: 'User', email: 'user@fournn.app', isOnboarded: true, emergencyPaused: false, subscriptionTier: 'free' };
   res.json({ user });
 });
@@ -160,23 +165,22 @@ const dashboardHandler = (req, res) => {
   });
 };
 
-app.get('/api/dashboard', authMiddleware, dashboardHandler);
-app.get('/api/dashboard/summary', authMiddleware, dashboardHandler);
+app.get(['/api/dashboard', '/dashboard', '/api/dashboard/summary', '/dashboard/summary'], authMiddleware, dashboardHandler);
 
 // 3. ATTENTION
-app.get('/api/attention', authMiddleware, (req, res) => {
+app.get(['/api/attention', '/attention'], authMiddleware, (req, res) => {
   const items = userAttention.get(req.userId) || [
     { _id: 'att_1', title: '₹2,400 E-Commerce Refund Overdue', priority: 'Urgent', category: 'Financial', status: 'Pending Review', summary: 'Order return received 5 days ago.' }
   ];
   res.json({ items });
 });
 
-app.post('/api/attention/:id/execute', authMiddleware, (req, res) => {
+app.post(['/api/attention/:id/execute', '/attention/:id/execute'], authMiddleware, (req, res) => {
   res.json({ success: true });
 });
 
 // 4. DECISIONS
-app.get('/api/decisions', authMiddleware, (req, res) => {
+app.get(['/api/decisions', '/decisions'], authMiddleware, (req, res) => {
   const decisions = userDecisions.get(req.userId) || [
     { _id: 'dec_1', title: 'Dev Laptop Upgrade Selection', category: 'Hardware', status: 'In Analysis', recommendedOption: 'MacBook Pro M3 Max' }
   ];
@@ -184,7 +188,7 @@ app.get('/api/decisions', authMiddleware, (req, res) => {
 });
 
 // 5. GOALS
-app.get('/api/goals', authMiddleware, (req, res) => {
+app.get(['/api/goals', '/goals'], authMiddleware, (req, res) => {
   const goals = userGoals.get(req.userId) || [
     { _id: 'goal_1', title: 'Land Senior AI Role', category: 'Career', progress: 60 }
   ];
@@ -192,7 +196,7 @@ app.get('/api/goals', authMiddleware, (req, res) => {
 });
 
 // 6. GRAPH
-app.get('/api/graph', authMiddleware, (req, res) => {
+app.get(['/api/graph', '/graph'], authMiddleware, (req, res) => {
   res.json({
     nodes: [
       { id: 'u1', label: 'User', category: 'Person' },
@@ -207,14 +211,14 @@ app.get('/api/graph', authMiddleware, (req, res) => {
 });
 
 // 7. DEMO CLEAR & INGEST
-app.post('/api/demo/clear', authMiddleware, (req, res) => {
+app.post(['/api/demo/clear', '/demo/clear'], authMiddleware, (req, res) => {
   userAttention.set(req.userId, []);
   userDecisions.set(req.userId, []);
   userGoals.set(req.userId, []);
   res.json({ success: true });
 });
 
-app.post('/api/integrations/ingest-email', authMiddleware, (req, res) => {
+app.post(['/api/integrations/ingest-email', '/integrations/ingest-email'], authMiddleware, (req, res) => {
   const { subject, sender, body } = req.body;
   const items = userAttention.get(req.userId) || [];
   const newItem = {
@@ -232,7 +236,7 @@ app.post('/api/integrations/ingest-email', authMiddleware, (req, res) => {
   res.json({ success: true, item: newItem });
 });
 
-app.get('/api/integrations', authMiddleware, (req, res) => {
+app.get(['/api/integrations', '/integrations'], authMiddleware, (req, res) => {
   res.json({
     integrations: [
       { _id: 'i1', service: 'gmail', connected: true, accountEmail: 'user@fournn.app' },
@@ -241,12 +245,17 @@ app.get('/api/integrations', authMiddleware, (req, res) => {
   });
 });
 
-app.get('/api/memory', authMiddleware, (req, res) => {
+app.get(['/api/memory', '/memory'], authMiddleware, (req, res) => {
   res.json({ memories: [] });
 });
 
-app.get('/api/activity', authMiddleware, (req, res) => {
+app.get(['/api/activity', '/activity'], authMiddleware, (req, res) => {
   res.json({ activities: [] });
+});
+
+// Catch-all 404 handler for unmatched API routes
+app.use((req, res) => {
+  res.status(404).json({ error: 'Endpoint not found', path: req.path });
 });
 
 // Export serverless handler
