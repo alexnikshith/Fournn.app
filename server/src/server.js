@@ -10,7 +10,7 @@ const PORT = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
-// Serverless DB Connection Manager
+// Clean Serverless DB Connection Manager (Zero Binary Dependencies)
 let isConnected = false;
 
 async function connectDB() {
@@ -23,29 +23,14 @@ async function connectDB() {
   if (mongoUri && mongoUri.trim().length > 0) {
     try {
       await mongoose.connect(mongoUri, {
-        serverSelectionTimeoutMS: 5000,
-        connectTimeoutMS: 5000
+        serverSelectionTimeoutMS: 4000,
+        connectTimeoutMS: 4000
       });
       isConnected = true;
-      console.log('Connected to MongoDB Atlas.');
+      console.log('Connected to MongoDB Atlas database successfully.');
       return;
     } catch (err) {
-      console.error('MongoDB Atlas connection failed:', err.message);
-    }
-  }
-
-  // Only attempt MongoMemoryServer in local development (Never in Vercel Serverless environment)
-  if (!process.env.VERCEL) {
-    try {
-      const { MongoMemoryServer } = require('mongodb-memory-server');
-      const mongod = await MongoMemoryServer.create();
-      const memoryUri = mongod.getUri();
-      await mongoose.connect(memoryUri);
-      isConnected = true;
-      console.log('Connected to local MongoMemoryServer at:', memoryUri);
-      return;
-    } catch (memErr) {
-      console.error('MongoMemoryServer fallback failed:', memErr.message);
+      console.error('MongoDB Atlas connection attempt failed:', err.message);
     }
   }
 }
