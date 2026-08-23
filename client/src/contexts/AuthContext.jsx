@@ -4,14 +4,18 @@ const AuthContext = createContext();
 
 const parseJsonResponse = async (res) => {
   const text = await res.text();
+  let data = {};
   try {
-    return JSON.parse(text);
+    data = JSON.parse(text);
   } catch (err) {
-    if (!res.ok) {
-      throw new Error(`Server Error (${res.status}): Please check your MONGODB_URI environment variable on Vercel.`);
-    }
-    throw new Error('Received unexpected response format from server.');
+    data = { error: text || `Server returned response with status ${res.status}` };
   }
+
+  if (!res.ok) {
+    throw new Error(data.error || `Request failed with status ${res.status}`);
+  }
+
+  return data;
 };
 
 export const AuthProvider = ({ children }) => {
@@ -60,7 +64,6 @@ export const AuthProvider = ({ children }) => {
       body: JSON.stringify({ email, password })
     });
     const data = await parseJsonResponse(res);
-    if (!res.ok) throw new Error(data.error || 'Login failed');
     localStorage.setItem('fournn_token', data.token);
     setToken(data.token);
     setUser(data.user);
@@ -74,7 +77,6 @@ export const AuthProvider = ({ children }) => {
       body: JSON.stringify({ name, email, password })
     });
     const data = await parseJsonResponse(res);
-    if (!res.ok) throw new Error(data.error || 'Registration failed');
     localStorage.setItem('fournn_token', data.token);
     setToken(data.token);
     setUser(data.user);
