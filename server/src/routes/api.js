@@ -169,7 +169,7 @@ router.get('/auth/me', authMiddleware, async (req, res) => {
 });
 
 // 2. DASHBOARD METRICS
-router.get('/dashboard/summary', authMiddleware, async (req, res) => {
+const getDashboardSummaryHandler = async (req, res) => {
   try {
     if (isDbActive()) {
       const urgentAttentionCount = await AttentionItem.countDocuments({ userId: req.userId, status: { $ne: 'Resolved' } });
@@ -218,7 +218,10 @@ router.get('/dashboard/summary', authMiddleware, async (req, res) => {
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
-});
+};
+
+router.get('/dashboard', authMiddleware, getDashboardSummaryHandler);
+router.get('/dashboard/summary', authMiddleware, getDashboardSummaryHandler);
 
 // 3. CONTEXT GRAPH
 router.get('/graph', authMiddleware, async (req, res) => {
