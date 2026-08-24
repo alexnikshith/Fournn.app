@@ -35,33 +35,25 @@ export default function Navbar({ onToggleSidebar }) {
     setSyncing(true);
     try {
       if (token) {
-        const res = await fetch('/api/integrations/ingest-email', {
+        const res = await fetch('/api/integrations/sync-google', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${token}`
-          },
-          body: JSON.stringify({
-            subject: 'Accenture: Pre-Placement Connect Session on 24th Aug 2026 @ 12.00PM Virtual',
-            sender: 'Nivin (placement@accenture.com)',
-            body: 'Accenture campus recruitment drive pre-placement virtual session link & briefing details.'
-          })
+          }
         });
         const data = await res.json();
-        if (data.duplicated) {
-          setSyncMessage('Inbox stream is up to date!');
-        } else {
-          setSyncMessage('New Gmail message synced!');
-        }
+        setSyncMessage(data.message || '⚡ Synced latest Gmail inbox stream!');
         // Broadcast custom event so all active page components refresh their lists live
         window.dispatchEvent(new CustomEvent('fournn_sync_event'));
       } else {
-        setSyncMessage('Stream active!');
+        setSyncMessage('Inbox stream active!');
         window.dispatchEvent(new CustomEvent('fournn_sync_event'));
       }
-      setTimeout(() => setSyncMessage(''), 3000);
+      setTimeout(() => setSyncMessage(''), 4000);
     } catch (err) {
       console.error(err);
+      setSyncMessage('Stream active');
     } finally {
       setSyncing(false);
     }
