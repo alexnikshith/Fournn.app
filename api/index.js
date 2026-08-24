@@ -524,6 +524,7 @@ app.post(['/api/attention/:id/execute', '/attention/:id/execute'], authMiddlewar
   const updatedItems = items.map(item => item._id === req.params.id ? { 
     ...item, 
     status: 'Resolved & Sent Live',
+    draftResponse: emailContent,
     dispatchedTo: targetRecipient,
     dispatchedAt: new Date().toLocaleString()
   } : item);
