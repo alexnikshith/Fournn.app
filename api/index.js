@@ -493,14 +493,22 @@ app.post(['/api/attention/:id/execute', '/attention/:id/execute'], authMiddlewar
     dispatchMessage = `Real email dispatched for ${targetRecipient}`;
   }
 
-  const updatedItems = items.map(item => item._id === req.params.id ? { 
-    ...item, 
+  // Create permanent resolved item record
+  const resolvedItem = {
+    ...(targetItem || { _id: req.params.id, title: 'Dispatched Email', category: 'Personal', summary: emailContent }),
     status: 'Resolved & Sent Live',
     draftResponse: emailContent,
     dispatchedTo: targetRecipient,
     dispatchedAt: new Date().toLocaleString()
-  } : item);
-  userAttention.set(req.userId, updatedItems);
+  };
+
+  // Remove from pending attention items
+  const remainingItems = items.filter(item => item._id !== req.params.id);
+  userAttention.set(req.userId, remainingItems);
+
+  // Store permanently in userDispatchedMap
+  const existingDispatched = userDispatchedMap.get(req.userId) || [];
+  userDispatchedMap.set(req.userId, [resolvedItem, ...existingDispatched]);
 
   // Log to Agent Activity Audit Log
   logAgentActivity(
