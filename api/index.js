@@ -365,14 +365,14 @@ app.get(['/api/dashboard', '/dashboard', '/api/dashboard/summary', '/dashboard/s
 // 3. ATTENTION
 app.get(['/api/attention', '/attention'], authMiddleware, (req, res) => {
   let items = userAttention.get(req.userId);
-  if (!items) {
+  if (!items || !Array.isArray(items) || items.length === 0) {
     const user = usersById.get(req.userId);
     seedDemoUser(req.userId, user?.name || 'Nikshith', user?.email || 'nikshithgurram2006@gmail.com');
     items = userAttention.get(req.userId) || [];
   }
 
   let dispatched = userDispatchedMap.get(req.userId);
-  if (!dispatched || dispatched.length === 0) {
+  if (!dispatched || !Array.isArray(dispatched) || dispatched.length === 0) {
     const user = usersById.get(req.userId);
     seedDemoUser(req.userId, user?.name || 'Nikshith', user?.email || 'nikshithgurram2006@gmail.com');
     dispatched = userDispatchedMap.get(req.userId) || [];
