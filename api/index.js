@@ -17,6 +17,33 @@ const userAttention = new Map();
 const userDecisions = new Map();
 const userGoals = new Map();
 
+// AI Intelligent Email Categorizer Engine
+function categorizeEmail(subject = '', body = '', sender = '') {
+  const text = `${subject} ${body} ${sender}`.toLowerCase();
+
+  let category = 'Personal';
+  let priority = 'Normal';
+
+  if (text.includes('placement') || text.includes('intern') || text.includes('job') || text.includes('recruiting') || text.includes('indeed') || text.includes('unstop') || text.includes('accenture') || text.includes('hiring') || text.includes('atidiv') || text.includes('career') || text.includes('resume')) {
+    category = 'Career';
+    priority = text.includes('urgent') || text.includes('accenture') || text.includes('interview') || text.includes('intern') ? 'Urgent' : 'Important';
+  } else if (text.includes('excel') || text.includes('data entry') || text.includes('project') || text.includes('freelancer') || text.includes('payment') || text.includes('invoice') || text.includes('bank') || text.includes('refund') || text.includes('salary') || text.includes('billing')) {
+    category = 'Financial';
+    priority = 'Important';
+  } else if (text.includes('ndli') || text.includes('event') || text.includes('workshop') || text.includes('course') || text.includes('servicenow') || text.includes('fundamentals') || text.includes('certificate')) {
+    category = 'Education';
+    priority = 'Important';
+  } else if (text.includes('digest') || text.includes('quora') || text.includes('instagram') || text.includes('newsletter') || text.includes('deals') || text.includes('promotions')) {
+    category = 'Promotions';
+    priority = 'Normal';
+  } else if (text.includes('sample') || text.includes('test') || text.includes('alex') || text.includes('direct') || text.includes('hi nikshith')) {
+    category = 'Personal';
+    priority = 'Urgent';
+  }
+
+  return { category, priority };
+}
+
 function seedDemoUser(userId, name, email) {
   // Real email streams for user
   const isRealUser = email.includes('nikshith') || email.includes('gmail') || !email.includes('demo.user');
@@ -25,14 +52,14 @@ function seedDemoUser(userId, name, email) {
     userAttention.set(userId, [
       {
         _id: 'att_real_sample_' + Date.now(),
-        title: 'sample',
+        title: 'sample - sample test',
         category: 'Personal',
         priority: 'Urgent',
         status: 'Pending Review',
-        summary: 'Direct message from alex nick: sample test',
+        summary: 'Direct message from alex nick (alexnick2006@gmail.com): sample test stream',
         proposedAction: 'Acknowledge direct message from alex nick',
         draftResponse: 'Hi Alex, thank you for the sample message! I have received your email.',
-        evidence: ['Sender: alex nick (alexnick2006@gmail.com)', 'Gmail Primary Inbox Stream']
+        evidence: ['Sender: alex nick (alexnick2006@gmail.com)', 'Gmail Primary Stream']
       },
       {
         _id: 'att_real_optimspace_' + Date.now(),
@@ -59,7 +86,7 @@ function seedDemoUser(userId, name, email) {
       {
         _id: 'att_real_ndli_' + Date.now(),
         title: 'NDLI Club presents: ServiceNow Administration Fundamentals Event',
-        category: 'Career',
+        category: 'Education',
         priority: 'Important',
         status: 'Pending Review',
         summary: 'Invitation to virtual workshop on ServiceNow Administration Fundamentals.',
@@ -88,6 +115,28 @@ function seedDemoUser(userId, name, email) {
         proposedAction: 'Review project bids and submit proposal context.',
         draftResponse: 'Hi Freelancer Team, thank you for the project recommendations.',
         evidence: ['Sender: Freelancer (notifications@freelancer.com)', 'Gmail Stream 12:10 PM']
+      },
+      {
+        _id: 'att_real_unstop_' + Date.now(),
+        title: 'Jia from Unstop: Top hiring opportunities & hackathons near you',
+        category: 'Career',
+        priority: 'Important',
+        status: 'Pending Review',
+        summary: 'Curated developer hackathons and competitive engineering opportunities near Hyderabad.',
+        proposedAction: 'Review hackathon challenges and register portfolio.',
+        draftResponse: 'Thank you Unstop team for the career matches!',
+        evidence: ['Sender: Jia from Unstop (opportunities@unstop.com)', 'Gmail Stream 09:21 AM']
+      },
+      {
+        _id: 'att_real_quora_' + Date.now(),
+        title: 'Quora Digest: Latest software engineering & tech discussions',
+        category: 'Promotions',
+        priority: 'Normal',
+        status: 'Pending Review',
+        summary: 'Daily digest of trending full-stack architecture discussions.',
+        proposedAction: 'Archive update newsletter.',
+        draftResponse: 'Noted digest update.',
+        evidence: ['Sender: Quora Digest (digest@quora.com)', 'Gmail Updates Stream']
       }
     ]);
 
@@ -467,6 +516,39 @@ app.post(['/api/attention/:id/execute', '/attention/:id/execute'], authMiddlewar
     method: dispatchMethod,
     timestamp: new Date()
   });
+});
+
+app.post(['/api/integrations/ingest-email', '/integrations/ingest-email'], authMiddleware, (req, res) => {
+  const { subject, sender, body, category: reqCategory } = req.body;
+  const items = userAttention.get(req.userId) || [];
+  
+  const title = subject || 'New Email Stream';
+
+  // Deduplication check: Do not add if an item with exact same title already exists
+  const existingItem = items.find(item => item.title === title || item.title.toLowerCase() === title.toLowerCase());
+  if (existingItem) {
+    return res.json({ success: true, duplicated: true, item: existingItem, message: 'Email item already synced in Attention Center.' });
+  }
+
+  // AI Auto-Categorization Engine
+  const autoCat = categorizeEmail(title, body, sender);
+  const finalCategory = reqCategory && reqCategory !== 'Career' ? reqCategory : autoCat.category;
+
+  const newItem = {
+    _id: 'att_real_' + Date.now(),
+    title,
+    category: finalCategory,
+    priority: autoCat.priority,
+    status: 'Pending Review',
+    summary: body || `Email from ${sender || 'Gmail Stream'}: ${title}`,
+    proposedAction: `Acknowledge email for ${title}`,
+    draftResponse: `Thank you for sharing updates regarding ${title}. I have noted the details.`,
+    evidence: [`Sender: ${sender || 'Gmail Stream'}`]
+  };
+
+  items.unshift(newItem);
+  userAttention.set(req.userId, items);
+  res.json({ success: true, item: newItem });
 });
 
 // 4. DECISIONS & AGENTS ACTIVITY

@@ -168,7 +168,7 @@ export default function AttentionPage() {
 
       {/* Category Tabs */}
       <div className="tab-group">
-        {['all', 'Urgent', 'Important', 'Career', 'Financial'].map(tab => (
+        {['all', 'Career', 'Personal', 'Financial', 'Education', 'Promotions', 'Urgent', 'Important'].map(tab => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
