@@ -55,18 +55,30 @@ function ProtectedLayout({ children }) {
 // Wrapper for graph page
 function GraphPageWrapper() {
   const { token } = useAuth();
-  const [graphData, setGraphData] = React.useState({ nodes: [], edges: [] });
-  const [loading, setLoading] = React.useState(true);
+  const [graphData, setGraphData] = React.useState({
+    nodes: [
+      { id: 'usr_1', entityId: 'user_self', label: 'Nikshith (You)', category: 'Person', details: 'Personal OS User Context' },
+      { id: 'n1', entityId: 'evt_interview', label: 'Accenture Placement Session', category: 'Event', details: 'Virtual orientation session today @ 12:00 PM' },
+      { id: 'n2', entityId: 'email_invite', label: 'Full-Stack Roles Hyderabad', category: 'Email', details: '₹9.5L - ₹15L+ Senior Developer Opportunity' },
+      { id: 'n3', entityId: 'goal_career', label: 'Land Senior AI Role', category: 'Goal', details: 'Target Date: Oct 2026' },
+      { id: 'n4', entityId: 'comp_google', label: 'Accenture Placement Cell', category: 'Company', details: 'Campus Recruitment Stream' }
+    ],
+    edges: [
+      { id: 'e1', source: 'usr_1', target: 'n1', label: 'attending' },
+      { id: 'e2', source: 'usr_1', target: 'n2', label: 'received' },
+      { id: 'e3', source: 'n1', target: 'n3', label: 'advances' },
+      { id: 'e4', source: 'n4', target: 'n1', label: 'hosts' }
+    ]
+  });
 
   React.useEffect(() => {
     if (token) {
       fetch('/api/graph', { headers: { Authorization: `Bearer ${token}` } })
         .then(res => res.json())
         .then(data => {
-          if (data && data.nodes) setGraphData(data);
+          if (data && data.nodes && data.nodes.length > 0) setGraphData(data);
         })
-        .catch(err => console.error(err))
-        .finally(() => setLoading(false));
+        .catch(err => console.error(err));
     }
   }, [token]);
 
@@ -80,7 +92,7 @@ function GraphPageWrapper() {
           Interactive visualization of relationships between people, companies, events, goals, and decisions.
         </p>
       </div>
-      <InteractiveGraph graphData={graphData} />
+      <InteractiveGraph nodes={graphData.nodes} edges={graphData.edges} />
     </div>
   );
 }

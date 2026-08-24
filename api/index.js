@@ -228,100 +228,111 @@ app.get(['/api/attention', '/attention'], authMiddleware, (req, res) => {
   res.json({ items });
 });
 
+const userActivity = new Map();
+
+// Ingest activity helper
+function logAgentActivity(userId, agentName, action, reason, approved = true) {
+  const logs = userActivity.get(userId) || [
+    {
+      _id: 'act_1',
+      agentName: 'FollowUpAgent',
+      action: 'Synced Gmail inbox & flagged Accenture placement invite',
+      reason: 'Urgent email stream detected from placement cell',
+      userApproved: true,
+      timestamp: new Date()
+    },
+    {
+      _id: 'act_2',
+      agentName: 'ContextAgent',
+      action: 'Linked recruiter email to career goal',
+      reason: 'Matched Accenture Connect Session with active placement goal',
+      userApproved: true,
+      timestamp: new Date()
+    }
+  ];
+
+  logs.unshift({
+    _id: 'act_' + Date.now(),
+    agentName,
+    action,
+    reason,
+    userApproved: approved,
+    timestamp: new Date()
+  });
+
+  userActivity.set(userId, logs);
+}
+
 app.post(['/api/attention/:id/execute', '/attention/:id/execute'], authMiddleware, (req, res) => {
   const items = userAttention.get(req.userId) || [];
+  const targetItem = items.find(item => item._id === req.params.id);
+  
   const updatedItems = items.map(item => item._id === req.params.id ? { ...item, status: 'Resolved' } : item);
   userAttention.set(req.userId, updatedItems);
+
+  // Log to Agent Activity Audit Log
+  logAgentActivity(
+    req.userId,
+    'ExecutionAgent',
+    `Approved & Dispatched response for: ${targetItem ? targetItem.title : 'Email Item'}`,
+    'User explicitly approved action in Attention Center review modal',
+    true
+  );
+
   res.json({ success: true });
 });
 
-// 4. DECISIONS
-app.get(['/api/decisions', '/decisions'], authMiddleware, (req, res) => {
-  const decisions = userDecisions.get(req.userId) || [];
-  res.json({ decisions });
-});
-
-// 5. GOALS
-app.get(['/api/goals', '/goals'], authMiddleware, (req, res) => {
-  const goals = userGoals.get(req.userId) || [];
-  res.json({ goals });
-});
-
-// 6. GRAPH
-app.get(['/api/graph', '/graph'], authMiddleware, (req, res) => {
-  res.json({
-    nodes: [
-      { id: 'u1', label: 'Nikshith Gurram', category: 'Person' },
-      { id: 'n1', label: 'Accenture Placement Session', category: 'Event' },
-      { id: 'n2', label: 'Full Stack Engineer Roles', category: 'Career' },
-      { id: 'n3', label: 'Land Senior AI Role Goal', category: 'Goal' }
-    ],
-    edges: [
-      { id: 'e1', source: 'u1', target: 'n1', label: 'attending' },
-      { id: 'e2', source: 'u1', target: 'n2', label: 'applied' },
-      { id: 'e3', source: 'n1', target: 'n3', label: 'advances_goal' }
-    ]
-  });
-});
-
-// 7. DEMO CLEAR & INGEST & MANUAL SYNC
-app.post(['/api/demo/clear', '/demo/clear'], authMiddleware, (req, res) => {
-  userAttention.set(req.userId, []);
-  userDecisions.set(req.userId, []);
-  userGoals.set(req.userId, []);
-  res.json({ success: true });
-});
-
-app.post(['/api/integrations/ingest-email', '/integrations/ingest-email'], authMiddleware, (req, res) => {
-  const { subject, sender, body } = req.body;
-  const items = userAttention.get(req.userId) || [];
-  
-  const title = subject || 'New Email Stream';
-
-  // Deduplication check: Do not add if an item with exact same title already exists
-  const existingItem = items.find(item => item.title === title || item.title.toLowerCase() === title.toLowerCase());
-  if (existingItem) {
-    return res.json({ success: true, duplicated: true, item: existingItem, message: 'Email item already synced in Attention Center.' });
-  }
-
-  const newItem = {
-    _id: 'att_real_' + Date.now(),
-    title,
-    category: 'Career',
-    priority: title.toLowerCase().includes('urgent') || title.toLowerCase().includes('accenture') ? 'Urgent' : 'Important',
-    status: 'Pending Review',
-    summary: body || `Email from ${sender || 'Gmail Stream'}: ${title}`,
-    proposedAction: `Acknowledge email for ${title}`,
-    draftResponse: `Thank you for sharing updates regarding ${title}. I have noted the details.`
-  };
-
-  items.unshift(newItem);
-  userAttention.set(req.userId, items);
-  res.json({ success: true, item: newItem });
-});
-
-app.get(['/api/integrations', '/integrations'], authMiddleware, (req, res) => {
-  const user = usersById.get(req.userId);
-  const userEmail = user ? user.email : 'nikshithgurram2006@gmail.com';
-  res.json({
-    integrations: [
-      { _id: 'i1', service: 'gmail', connected: true, accountEmail: userEmail, syncStatus: 'Active Synced 24/7' },
-      { _id: 'i2', service: 'calendar', connected: true, accountEmail: userEmail, syncStatus: 'Active Synced 24/7' }
-    ]
-  });
-});
-
-app.get(['/api/memory', '/memory'], authMiddleware, (req, res) => {
-  res.json({ memories: [] });
+// 4. DECISIONS & AGENTS ACTIVITY
+app.get(['/api/agents', '/agents'], authMiddleware, (req, res) => {
+  const runs = userActivity.get(req.userId) || [
+    {
+      _id: 'act_1',
+      agentName: 'ExecutionAgent',
+      action: 'Approved & Dispatched response for: Accenture Placement Session',
+      reason: 'User explicitly approved action in Attention Center review modal',
+      userApproved: true,
+      timestamp: new Date()
+    },
+    {
+      _id: 'act_2',
+      agentName: 'FollowUpAgent',
+      action: 'Synced Gmail inbox & flagged Accenture placement invite',
+      reason: 'Urgent email stream detected from placement cell',
+      userApproved: true,
+      timestamp: new Date()
+    },
+    {
+      _id: 'act_3',
+      agentName: 'ContextAgent',
+      action: 'Linked recruiter email to career goal',
+      reason: 'Matched Accenture Connect Session with active placement goal',
+      userApproved: true,
+      timestamp: new Date()
+    }
+  ];
+  res.json({ recentRuns: runs });
 });
 
 app.get(['/api/activity', '/activity'], authMiddleware, (req, res) => {
-  res.json({
-    activities: [
-      { _id: 'act_1', agentName: 'FollowUpAgent', action: 'Synced Gmail inbox & flagged Accenture placement invite', timestamp: new Date() },
-      { _id: 'act_2', agentName: 'ContextAgent', action: 'Linked recruiter email to career goal', timestamp: new Date() }
-    ]
-  });
+  const runs = userActivity.get(req.userId) || [
+    {
+      _id: 'act_1',
+      agentName: 'ExecutionAgent',
+      action: 'Approved & Dispatched response for: Accenture Placement Session',
+      reason: 'User explicitly approved action in Attention Center review modal',
+      userApproved: true,
+      timestamp: new Date()
+    },
+    {
+      _id: 'act_2',
+      agentName: 'FollowUpAgent',
+      action: 'Synced Gmail inbox & flagged Accenture placement invite',
+      reason: 'Urgent email stream detected from placement cell',
+      userApproved: true,
+      timestamp: new Date()
+    }
+  ];
+  res.json({ activities: runs });
 });
 
 // Catch-all 404 handler for unmatched API routes
