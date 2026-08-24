@@ -19,6 +19,7 @@ const userGoals = new Map();
 const userSituations = new Map();
 const userOutcomes = new Map();
 const userTimeline = new Map();
+const userDispatchedMap = new Map();
 
 // AI Intelligent Email Categorizer Engine
 function categorizeEmail(subject = '', body = '', sender = '') {
