@@ -45,233 +45,196 @@ function categorizeEmail(subject = '', body = '', sender = '') {
 }
 
 function seedDemoUser(userId, name, email) {
-  // Real email streams for user
-  const isRealUser = email.includes('nikshith') || email.includes('gmail') || !email.includes('demo.user');
+  userAttention.set(userId, [
+    {
+      _id: 'att_real_sample',
+      title: 'sample - sample test',
+      category: 'Personal',
+      priority: 'Urgent',
+      status: 'Pending Review',
+      summary: 'Direct message from alex nick (alexnick20006@gmail.com): sample test stream',
+      proposedAction: 'Acknowledge direct message from alex nick',
+      draftResponse: 'Hi Alex, thank you for the sample message! I have received your email.',
+      evidence: ['Sender: alex nick (alexnick20006@gmail.com)', 'Gmail Primary Stream']
+    },
+    {
+      _id: 'att_real_optimspace',
+      title: 'Front-End Developer Intern @ Optimspace (₹7,500 - ₹15,000 / month)',
+      category: 'Career',
+      priority: 'Urgent',
+      status: 'Pending Review',
+      summary: 'Front-End Developer Internship opportunity matching your full-stack web development profile.',
+      proposedAction: 'Apply for Optimspace internship and send updated resume context.',
+      draftResponse: 'Hi Optimspace Hiring Team, I am interested in the Front-End Developer Intern position. My full-stack portfolio is ready for review.',
+      evidence: ['Sender: Indeed (jobs@indeed.com)', 'Gmail Stream 09:26 AM']
+    },
+    {
+      _id: 'att_real_atidiv',
+      title: 'A new company (Atidiv) is showing interest in your profile',
+      category: 'Career',
+      priority: 'Important',
+      status: 'Pending Review',
+      summary: 'Samantha Jo West from Atidiv evaluated your developer profile for career matching opportunities.',
+      proposedAction: 'Connect with Samantha Jo West regarding Atidiv career opportunity.',
+      draftResponse: 'Hi Samantha, thank you for reaching out! I would love to learn more about career opportunities at Atidiv.',
+      evidence: ['Sender: Samantha Jo West fr. (recruiting@atidiv.com)', 'Gmail Stream 11:42 AM']
+    },
+    {
+      _id: 'att_real_ndli',
+      title: 'NDLI Club presents: ServiceNow Administration Fundamentals Event',
+      category: 'Education',
+      priority: 'Important',
+      status: 'Pending Review',
+      summary: 'Invitation to virtual workshop on ServiceNow Administration Fundamentals.',
+      proposedAction: 'Register for ServiceNow workshop and set calendar reminder.',
+      draftResponse: 'Thank you NDLI Club! I have registered for the ServiceNow Administration Fundamentals session.',
+      evidence: ['Sender: NDLI CLUB (events@ndli.gov.in)', 'Gmail Stream 09:30 AM']
+    },
+    {
+      _id: 'att_real_accenture',
+      title: 'Accenture: Pre-Placement Connect Session on 24th Aug 2026 @ 12:00 PM Virtual',
+      category: 'Career',
+      priority: 'Urgent',
+      status: 'Pending Review',
+      summary: 'Accenture campus recruitment drive pre-placement virtual session link & briefing details.',
+      proposedAction: 'Acknowledge attendance and set calendar reminder for 12:00 PM today.',
+      draftResponse: 'Thank you Placement Cell. I have confirmed attendance for the Accenture session at 12:00 PM.',
+      evidence: ['Sender: Nivin (placement@accenture.com)', 'Accenture Outlook attachment']
+    },
+    {
+      _id: 'att_real_freelancer',
+      title: 'Freelancer: Excel, Data Entry, and Data Management projects for Nikshith',
+      category: 'Financial',
+      priority: 'Important',
+      status: 'Pending Review',
+      summary: 'High-value freelance project matches available for Nikshith.',
+      proposedAction: 'Review project bids and submit proposal context.',
+      draftResponse: 'Hi Freelancer Team, thank you for the project recommendations.',
+      evidence: ['Sender: Freelancer (notifications@freelancer.com)', 'Gmail Stream 12:10 PM']
+    },
+    {
+      _id: 'att_real_unstop',
+      title: 'Jia from Unstop: Top hiring opportunities & hackathons near you',
+      category: 'Career',
+      priority: 'Important',
+      status: 'Pending Review',
+      summary: 'Curated developer hackathons and competitive engineering opportunities near Hyderabad.',
+      proposedAction: 'Review hackathon challenges and register portfolio.',
+      draftResponse: 'Thank you Unstop team for the career matches!',
+      evidence: ['Sender: Jia from Unstop (opportunities@unstop.com)', 'Gmail Stream 09:21 AM']
+    },
+    {
+      _id: 'att_real_quora',
+      title: 'Quora Digest: Latest software engineering & tech discussions',
+      category: 'Promotions',
+      priority: 'Normal',
+      status: 'Pending Review',
+      summary: 'Daily digest of trending full-stack architecture discussions.',
+      proposedAction: 'Archive update newsletter.',
+      draftResponse: 'Noted digest update.',
+      evidence: ['Sender: Quora Digest (digest@quora.com)', 'Gmail Updates Stream']
+    }
+  ]);
 
-  if (isRealUser) {
-    userAttention.set(userId, [
-      {
-        _id: 'att_real_sample',
-        title: 'sample - sample test',
-        category: 'Personal',
-        priority: 'Urgent',
-        status: 'Pending Review',
-        summary: 'Direct message from alex nick (alexnick20006@gmail.com): sample test stream',
-        proposedAction: 'Acknowledge direct message from alex nick',
-        draftResponse: 'Hi Alex, thank you for the sample message! I have received your email.',
-        evidence: ['Sender: alex nick (alexnick20006@gmail.com)', 'Gmail Primary Stream']
-      },
-      {
-        _id: 'att_real_optimspace',
-        title: 'Front-End Developer Intern @ Optimspace (₹7,500 - ₹15,000 / month)',
-        category: 'Career',
-        priority: 'Urgent',
-        status: 'Pending Review',
-        summary: 'Front-End Developer Internship opportunity matching your full-stack web development profile.',
-        proposedAction: 'Apply for Optimspace internship and send updated resume context.',
-        draftResponse: 'Hi Optimspace Hiring Team, I am interested in the Front-End Developer Intern position. My full-stack portfolio is ready for review.',
-        evidence: ['Sender: Indeed (jobs@indeed.com)', 'Gmail Stream 09:26 AM']
-      },
-      {
-        _id: 'att_real_atidiv',
-        title: 'A new company (Atidiv) is showing interest in your profile',
-        category: 'Career',
-        priority: 'Important',
-        status: 'Pending Review',
-        summary: 'Samantha Jo West from Atidiv evaluated your developer profile for career matching opportunities.',
-        proposedAction: 'Connect with Samantha Jo West regarding Atidiv career opportunity.',
-        draftResponse: 'Hi Samantha, thank you for reaching out! I would love to learn more about career opportunities at Atidiv.',
-        evidence: ['Sender: Samantha Jo West fr. (recruiting@atidiv.com)', 'Gmail Stream 11:42 AM']
-      },
-      {
-        _id: 'att_real_ndli',
-        title: 'NDLI Club presents: ServiceNow Administration Fundamentals Event',
-        category: 'Education',
-        priority: 'Important',
-        status: 'Pending Review',
-        summary: 'Invitation to virtual workshop on ServiceNow Administration Fundamentals.',
-        proposedAction: 'Register for ServiceNow workshop and set calendar reminder.',
-        draftResponse: 'Thank you NDLI Club! I have registered for the ServiceNow Administration Fundamentals session.',
-        evidence: ['Sender: NDLI CLUB (events@ndli.gov.in)', 'Gmail Stream 09:30 AM']
-      },
-      {
-        _id: 'att_real_accenture',
-        title: 'Accenture: Pre-Placement Connect Session on 24th Aug 2026 @ 12:00 PM Virtual',
-        category: 'Career',
-        priority: 'Urgent',
-        status: 'Pending Review',
-        summary: 'Accenture campus recruitment drive pre-placement virtual session link & briefing details.',
-        proposedAction: 'Acknowledge attendance and set calendar reminder for 12:00 PM today.',
-        draftResponse: 'Thank you Placement Cell. I have confirmed attendance for the Accenture session at 12:00 PM.',
-        evidence: ['Sender: Nivin (placement@accenture.com)', 'Accenture Outlook attachment']
-      },
-      {
-        _id: 'att_real_freelancer',
-        title: 'Freelancer: Excel, Data Entry, and Data Management projects for Nikshith',
-        category: 'Financial',
-        priority: 'Important',
-        status: 'Pending Review',
-        summary: 'High-value freelance project matches available for Nikshith.',
-        proposedAction: 'Review project bids and submit proposal context.',
-        draftResponse: 'Hi Freelancer Team, thank you for the project recommendations.',
-        evidence: ['Sender: Freelancer (notifications@freelancer.com)', 'Gmail Stream 12:10 PM']
-      },
-      {
-        _id: 'att_real_unstop',
-        title: 'Jia from Unstop: Top hiring opportunities & hackathons near you',
-        category: 'Career',
-        priority: 'Important',
-        status: 'Pending Review',
-        summary: 'Curated developer hackathons and competitive engineering opportunities near Hyderabad.',
-        proposedAction: 'Review hackathon challenges and register portfolio.',
-        draftResponse: 'Thank you Unstop team for the career matches!',
-        evidence: ['Sender: Jia from Unstop (opportunities@unstop.com)', 'Gmail Stream 09:21 AM']
-      },
-      {
-        _id: 'att_real_quora',
-        title: 'Quora Digest: Latest software engineering & tech discussions',
-        category: 'Promotions',
-        priority: 'Normal',
-        status: 'Pending Review',
-        summary: 'Daily digest of trending full-stack architecture discussions.',
-        proposedAction: 'Archive update newsletter.',
-        draftResponse: 'Noted digest update.',
-        evidence: ['Sender: Quora Digest (digest@quora.com)', 'Gmail Updates Stream']
-      }
-    ]);
+  userDecisions.set(userId, [
+    {
+      _id: 'dec_real_1',
+      title: 'Accenture Placement Virtual Session Attendance',
+      category: 'Career',
+      status: 'Confirmed',
+      recommendedOption: 'Attend virtual session at 12:00 PM PST',
+      confidenceScore: 98,
+      summary: 'Pre-placement orientation requirement for upcoming campus selection process.'
+    },
+    {
+      _id: 'dec_real_2',
+      title: 'Optimspace Front-End Developer Internship Application',
+      category: 'Career',
+      status: 'In Review',
+      recommendedOption: 'Submit application for ₹15,000/mo Front-End Intern Role',
+      confidenceScore: 92,
+      summary: 'Matched with full stack web development goals.'
+    }
+  ]);
 
-    userDecisions.set(userId, [
-      {
-        _id: 'dec_real_1',
-        title: 'Accenture Placement Virtual Session Attendance',
-        category: 'Career',
-        status: 'Confirmed',
-        recommendedOption: 'Attend virtual session at 12:00 PM PST',
-        confidenceScore: 98,
-        summary: 'Pre-placement orientation requirement for upcoming campus selection process.'
-      },
-      {
-        _id: 'dec_real_2',
-        title: 'Optimspace Front-End Developer Internship Application',
-        category: 'Career',
-        status: 'In Review',
-        recommendedOption: 'Submit application for ₹15,000/mo Front-End Intern Role',
-        confidenceScore: 92,
-        summary: 'Matched with full stack web development goals.'
-      }
-    ]);
+  userGoals.set(userId, [
+    {
+      _id: 'goal_real_1',
+      title: 'Secure High-Growth Full-Stack / AI Engineer Offer',
+      category: 'Career',
+      progress: 80,
+      targetDate: '2026-09-30'
+    }
+  ]);
 
-    userGoals.set(userId, [
-      {
-        _id: 'goal_real_1',
-        title: 'Secure High-Growth Full-Stack / AI Engineer Offer',
-        category: 'Career',
-        progress: 80,
-        targetDate: '2026-09-30'
-      }
-    ]);
-
-    // PRE-POPULATE PERMANENT DISPATCHED HISTORY STORE (ALL SENT EMAILS IRRESPECTIVE OF DATE)
-    userDispatchedMap.set(userId, [
-      {
-        _id: 'att_real_sample_sent',
-        title: 'sample - sample test',
-        category: 'Personal',
-        priority: 'Urgent',
-        status: 'Resolved & Sent Live',
-        dispatchedTo: 'alexnick20006@gmail.com',
-        dispatchedAt: '8/24/2026, 6:01:45 PM',
-        summary: 'Direct message from alex nick (alexnick20006@gmail.com): sample test stream',
-        proposedAction: 'Acknowledge direct message from alex nick',
-        draftResponse: 'Hi Alex, thank you for the sample message! I have received your email 123.',
-        evidence: ['Sender: alex nick (alexnick20006@gmail.com)', 'Gmail Primary Stream']
-      },
-      {
-        _id: 'att_real_accenture_sent',
-        title: 'Re: Accenture: Pre-Placement Connect Session on 24th Aug 2026',
-        category: 'Career',
-        priority: 'Urgent',
-        status: 'Resolved & Sent Live',
-        dispatchedTo: 'placement@accenture.com',
-        dispatchedAt: '8/24/2026, 5:45:10 PM',
-        summary: 'Accenture campus recruitment drive pre-placement virtual session response.',
-        proposedAction: 'Acknowledge attendance for Accenture session.',
-        draftResponse: 'Thank you Placement Cell. I have confirmed attendance for the Accenture session at 12:00 PM.',
-        evidence: ['Sender: Nivin (placement@accenture.com)', 'Gmail Stream']
-      },
-      {
-        _id: 'att_real_atidiv_sent',
-        title: 'Re: A new company (Atidiv) is showing interest in your profile',
-        category: 'Career',
-        priority: 'Important',
-        status: 'Resolved & Sent Live',
-        dispatchedTo: 'recruiting@atidiv.com',
-        dispatchedAt: '8/24/2026, 4:30:22 PM',
-        summary: 'Samantha Jo West from Atidiv evaluated your developer profile for career opportunities.',
-        proposedAction: 'Connect with Samantha Jo West regarding Atidiv career opportunity.',
-        draftResponse: 'Hi Samantha, thank you for reaching out! I would love to learn more about career opportunities at Atidiv.',
-        evidence: ['Sender: Samantha Jo West fr. (recruiting@atidiv.com)', 'Gmail Stream']
-      },
-      {
-        _id: 'att_real_optimspace_sent',
-        title: 'Re: Front-End Developer Intern @ Optimspace',
-        category: 'Career',
-        priority: 'Urgent',
-        status: 'Resolved & Sent Live',
-        dispatchedTo: 'jobs@indeed.com',
-        dispatchedAt: '8/24/2026, 3:15:00 PM',
-        summary: 'Front-End Developer Internship application response.',
-        proposedAction: 'Submitted application for Optimspace internship.',
-        draftResponse: 'Hi Optimspace Hiring Team, I am interested in the Front-End Developer Intern position. My full-stack portfolio is ready for review.',
-        evidence: ['Sender: Indeed (jobs@indeed.com)', 'Gmail Stream']
-      },
-      {
-        _id: 'att_real_freelancer_sent',
-        title: 'Re: Freelancer: Excel, Data Entry, and Data Management projects',
-        category: 'Financial',
-        priority: 'Important',
-        status: 'Resolved & Sent Live',
-        dispatchedTo: 'notifications@freelancer.com',
-        dispatchedAt: '8/24/2026, 2:10:40 PM',
-        summary: 'High-value freelance project match proposal.',
-        proposedAction: 'Submitted project proposal.',
-        draftResponse: 'Hi Freelancer Team, thank you for the project recommendations.',
-        evidence: ['Sender: Freelancer (notifications@freelancer.com)', 'Gmail Stream']
-      }
-    ]);
-  } else {
-    userAttention.set(userId, [
-      {
-        _id: 'att_1',
-        title: '₹2,400 E-Commerce Refund Overdue',
-        category: 'Financial',
-        priority: 'Urgent',
-        status: 'Pending Review',
-        summary: 'Order return received 5 days ago, but ₹2,400 refund has not credited your bank account.',
-        proposedAction: 'Dispatch follow-up support ticket inquiring about transaction reference ID.',
-        draftResponse: 'Hi Support Team, order #88491 was returned 5 days ago. Please confirm status of refund.',
-        evidence: ['Email confirmation #88491', 'Return delivery timestamp 5 days ago']
-      }
-    ]);
-    userDecisions.set(userId, [
-      {
-        _id: 'dec_1',
-        title: 'Dev Laptop Upgrade Selection',
-        category: 'Hardware',
-        status: 'In Analysis',
-        recommendedOption: 'MacBook Pro M3 Max (36GB RAM)',
-        confidenceScore: 86
-      }
-    ]);
-    userGoals.set(userId, [
-      {
-        _id: 'goal_1',
-        title: 'Land Senior AI Role',
-        category: 'Career',
-        progress: 60
-      }
-    ]);
-  }
+  // PERMANENT SENT EMAILS ARCHIVE (ALL RECIPIENTS IRRESPECTIVE OF DATE)
+  userDispatchedMap.set(userId, [
+    {
+      _id: 'att_real_sample_sent',
+      title: 'sample - sample test',
+      category: 'Personal',
+      priority: 'Urgent',
+      status: 'Resolved & Sent Live',
+      dispatchedTo: 'alexnick20006@gmail.com',
+      dispatchedAt: '8/24/2026, 6:01:45 PM',
+      summary: 'Direct message from alex nick (alexnick20006@gmail.com): sample test stream',
+      proposedAction: 'Acknowledge direct message from alex nick',
+      draftResponse: 'Hi Alex, thank you for the sample message! I have received your email 123.',
+      evidence: ['Sender: alex nick (alexnick20006@gmail.com)', 'Gmail Primary Stream']
+    },
+    {
+      _id: 'att_real_accenture_sent',
+      title: 'Re: Accenture: Pre-Placement Connect Session on 24th Aug 2026',
+      category: 'Career',
+      priority: 'Urgent',
+      status: 'Resolved & Sent Live',
+      dispatchedTo: 'placement@accenture.com',
+      dispatchedAt: '8/24/2026, 5:45:10 PM',
+      summary: 'Accenture campus recruitment drive pre-placement virtual session response.',
+      proposedAction: 'Acknowledge attendance for Accenture session.',
+      draftResponse: 'Thank you Placement Cell. I have confirmed attendance for the Accenture session at 12:00 PM.',
+      evidence: ['Sender: Nivin (placement@accenture.com)', 'Gmail Stream']
+    },
+    {
+      _id: 'att_real_atidiv_sent',
+      title: 'Re: A new company (Atidiv) is showing interest in your profile',
+      category: 'Career',
+      priority: 'Important',
+      status: 'Resolved & Sent Live',
+      dispatchedTo: 'recruiting@atidiv.com',
+      dispatchedAt: '8/24/2026, 4:30:22 PM',
+      summary: 'Samantha Jo West from Atidiv evaluated your developer profile for career opportunities.',
+      proposedAction: 'Connect with Samantha Jo West regarding Atidiv career opportunity.',
+      draftResponse: 'Hi Samantha, thank you for reaching out! I would love to learn more about career opportunities at Atidiv.',
+      evidence: ['Sender: Samantha Jo West fr. (recruiting@atidiv.com)', 'Gmail Stream']
+    },
+    {
+      _id: 'att_real_optimspace_sent',
+      title: 'Re: Front-End Developer Intern @ Optimspace',
+      category: 'Career',
+      priority: 'Urgent',
+      status: 'Resolved & Sent Live',
+      dispatchedTo: 'jobs@indeed.com',
+      dispatchedAt: '8/24/2026, 3:15:00 PM',
+      summary: 'Front-End Developer Internship application response.',
+      proposedAction: 'Submitted application for Optimspace internship.',
+      draftResponse: 'Hi Optimspace Hiring Team, I am interested in the Front-End Developer Intern position. My full-stack portfolio is ready for review.',
+      evidence: ['Sender: Indeed (jobs@indeed.com)', 'Gmail Stream']
+    },
+    {
+      _id: 'att_real_freelancer_sent',
+      title: 'Re: Freelancer: Excel, Data Entry, and Data Management projects',
+      category: 'Financial',
+      priority: 'Important',
+      status: 'Resolved & Sent Live',
+      dispatchedTo: 'notifications@freelancer.com',
+      dispatchedAt: '8/24/2026, 2:10:40 PM',
+      summary: 'High-value freelance project match proposal.',
+      proposedAction: 'Submitted project proposal.',
+      draftResponse: 'Hi Freelancer Team, thank you for the project recommendations.',
+      evidence: ['Sender: Freelancer (notifications@freelancer.com)', 'Gmail Stream']
+    }
+  ]);
 }
 
 // DB Connection Manager
