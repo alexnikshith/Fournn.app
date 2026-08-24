@@ -1,3 +1,6 @@
+import React, { useState, useEffect } from 'react';
+import { useAuth } from '../contexts/AuthContext';
+import { GitPullRequest, Plus, CheckCircle2, AlertTriangle, ShieldCheck, Sparkles } from 'lucide-react';
 import WeeklyReport from '../components/Intelligence/WeeklyReport';
 
 export default function DecisionPage() {

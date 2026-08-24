@@ -14,6 +14,7 @@ import {
   Sparkles,
   CreditCard
 } from 'lucide-react';
+import ContextDemo from '../components/Demo/ContextDemo';
 
 const DEFAULT_DASHBOARD_DATA = {
   metrics: { needAttention: 6, pendingDecisions: 2, activeGoals: 1, urgentAlerts: 3 },
@@ -46,8 +47,6 @@ const DEFAULT_DASHBOARD_DATA = {
     { agentName: 'ContextAgent', action: 'Linked recruiter email to career goal', status: 'Verified', createdAt: new Date() }
   ]
 };
-
-import ContextDemo from '../components/Demo/ContextDemo';
 
 export default function DashboardPage() {
   const { token, user } = useAuth();
