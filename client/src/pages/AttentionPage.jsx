@@ -192,9 +192,13 @@ export default function AttentionPage() {
       ) : filteredItems.length === 0 ? (
         <div className="glass-card" style={{ textAlign: 'center', padding: '4rem 2rem' }}>
           <CheckCircle2 color="var(--emerald-accent)" size={42} style={{ marginBottom: '1rem' }} />
-          <h3 style={{ fontSize: '1.4rem', marginBottom: '0.5rem' }}>No pending items needing attention!</h3>
+          <h3 style={{ fontSize: '1.4rem', marginBottom: '0.5rem' }}>
+            {activeTab === 'dispatched' ? 'No dispatched emails found under this filter' : 'No pending items needing attention!'}
+          </h3>
           <p style={{ color: 'var(--text-muted)', fontSize: '1rem', maxWidth: 480, margin: '0 auto 1.5rem' }}>
-            All email actions have been dispatched in real time. Click "Ingest Real Email" below to add a new message stream.
+            {activeTab === 'dispatched' 
+              ? 'Dispatched emails will be permanently stored and listed here once approved.' 
+              : 'All email actions have been dispatched in real time. Click "Ingest Real Email" below to add a new message stream.'}
           </p>
           <button onClick={() => setShowIngestModal(true)} className="btn btn-primary">
             <Mail size={18} />
@@ -203,51 +207,73 @@ export default function AttentionPage() {
         </div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-          {filteredItems.map(item => (
-            <div key={item._id} className="glass-card highlight">
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.75rem' }}>
-                <div style={{ display: 'flex', gap: '0.65rem', alignItems: 'center' }}>
-                  <span className={`badge ${item.priority === 'Urgent' ? 'badge-urgent' : 'badge-important'}`}>
-                    {item.priority}
-                  </span>
-                  <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: 600 }}>{item.category}</span>
-                </div>
-                <span style={{ fontSize: '0.82rem', color: 'var(--emerald-accent)', fontWeight: 600 }}>Status: {item.status}</span>
-              </div>
+          {filteredItems.map(item => {
+            const isDispatched = item.status === 'Resolved & Sent Live' || item.status === 'Resolved';
 
-              <h3 style={{ fontSize: '1.35rem', marginBottom: '0.6rem' }}>{item.title}</h3>
-              <p style={{ color: 'var(--text-muted)', fontSize: '1.02rem', lineHeight: 1.6, marginBottom: '1.25rem' }}>
-                {item.summary}
-              </p>
-
-              {item.proposedAction && (
-                <div style={{ background: 'var(--bg-surface)', padding: '1rem 1.25rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)', marginBottom: '1.25rem' }}>
-                  <div style={{ fontSize: '0.82rem', color: 'var(--gold-main)', fontWeight: 700, textTransform: 'uppercase', marginBottom: '0.3rem' }}>
-                    Proposed Action
-                  </div>
-                  <div style={{ fontSize: '0.98rem', color: 'var(--text-main)' }}>{item.proposedAction}</div>
-                </div>
-              )}
-
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
-                <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-                  {item.evidence?.map((ev, i) => (
-                    <span key={i} style={{ fontSize: '0.8rem', background: 'rgba(255, 255, 255, 0.05)', padding: '0.25rem 0.65rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)', color: 'var(--text-dim)' }}>
-                      {ev}
+            return (
+              <div key={item._id} className="glass-card highlight" style={isDispatched ? { borderLeft: '4px solid var(--emerald-accent)' } : {}}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.75rem' }}>
+                  <div style={{ display: 'flex', gap: '0.65rem', alignItems: 'center' }}>
+                    <span className={`badge ${isDispatched ? 'badge-resolved' : item.priority === 'Urgent' ? 'badge-urgent' : 'badge-important'}`}>
+                      {isDispatched ? 'DISPATCHED' : item.priority}
                     </span>
-                  ))}
+                    <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: 600 }}>{item.category}</span>
+                  </div>
+                  <span style={{ fontSize: '0.82rem', color: 'var(--emerald-accent)', fontWeight: 700 }}>
+                    Status: {item.status || 'Resolved & Sent Live'}
+                  </span>
                 </div>
 
-                <button 
-                  onClick={() => openReviewModal(item)} 
-                  className="btn btn-primary btn-sm"
-                >
-                  <Send size={16} />
-                  <span>Review & Dispatch Real Email</span>
-                </button>
+                <h3 style={{ fontSize: '1.35rem', marginBottom: '0.6rem' }}>{item.title}</h3>
+                <p style={{ color: 'var(--text-muted)', fontSize: '1.02rem', lineHeight: 1.6, marginBottom: '1.25rem' }}>
+                  {item.summary}
+                </p>
+
+                {isDispatched && (
+                  <div style={{ background: 'var(--bg-surface)', padding: '1rem 1.25rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)', marginBottom: '1.25rem' }}>
+                    <div style={{ fontSize: '0.82rem', color: 'var(--emerald-accent)', fontWeight: 700, textTransform: 'uppercase', marginBottom: '0.3rem' }}>
+                      ⚡ Sent Live To: {item.dispatchedTo || 'alexnick20006@gmail.com'}
+                    </div>
+                    <div style={{ fontSize: '0.94rem', color: 'var(--text-main)', fontStyle: 'italic', marginBottom: '0.5rem' }}>
+                      "{item.draftResponse}"
+                    </div>
+                    <div style={{ fontSize: '0.78rem', color: 'var(--text-dim)' }}>
+                      Verified Audit Timestamp: {item.dispatchedAt || 'Sent via Gmail Account'}
+                    </div>
+                  </div>
+                )}
+
+                {!isDispatched && item.proposedAction && (
+                  <div style={{ background: 'var(--bg-surface)', padding: '1rem 1.25rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)', marginBottom: '1.25rem' }}>
+                    <div style={{ fontSize: '0.82rem', color: 'var(--gold-main)', fontWeight: 700, textTransform: 'uppercase', marginBottom: '0.3rem' }}>
+                      Proposed Action
+                    </div>
+                    <div style={{ fontSize: '0.98rem', color: 'var(--text-main)' }}>{item.proposedAction}</div>
+                  </div>
+                )}
+
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
+                  <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                    {item.evidence?.map((ev, i) => (
+                      <span key={i} style={{ fontSize: '0.8rem', background: 'rgba(255, 255, 255, 0.05)', padding: '0.25rem 0.65rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)', color: 'var(--text-dim)' }}>
+                        {ev}
+                      </span>
+                    ))}
+                  </div>
+
+                  {!isDispatched && (
+                    <button 
+                      onClick={() => openReviewModal(item)} 
+                      className="btn btn-primary btn-sm"
+                    >
+                      <Send size={16} />
+                      <span>Review & Dispatch Real Email</span>
+                    </button>
+                  )}
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
 
