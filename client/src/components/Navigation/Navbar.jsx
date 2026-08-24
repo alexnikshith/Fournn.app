@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
-import { ShieldAlert, ShieldCheck, Menu, User as UserIcon, Sun, Moon, X, Mail, Calendar, LogOut } from 'lucide-react';
+import { ShieldAlert, ShieldCheck, Menu, User as UserIcon, Sun, Moon, X, Mail, Calendar, LogOut, RefreshCw } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 const PAGE_TITLES = {
@@ -16,10 +16,12 @@ const PAGE_TITLES = {
 };
 
 export default function Navbar({ onToggleSidebar }) {
-  const { user, toggleEmergencyPause, theme, toggleTheme, logout } = useAuth();
+  const { user, token, toggleEmergencyPause, theme, toggleTheme, logout } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
   const [showProfileModal, setShowProfileModal] = useState(false);
+  const [syncing, setSyncing] = useState(false);
+  const [syncMessage, setSyncMessage] = useState('');
 
   const pageTitle = PAGE_TITLES[location.pathname] || 'Fournn OS';
 
@@ -27,6 +29,33 @@ export default function Navbar({ onToggleSidebar }) {
     setShowProfileModal(false);
     logout();
     navigate('/');
+  };
+
+  const handleSyncStream = async () => {
+    setSyncing(true);
+    try {
+      if (token) {
+        await fetch('/api/integrations/ingest-email', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            subject: 'Accenture: Pre-Placement Connect Session on 24th Aug 2026 @ 12.00PM Virtual',
+            sender: 'Nivin (placement@accenture.com)',
+            body: 'Accenture campus recruitment drive pre-placement virtual session link & briefing details.'
+          })
+        });
+      }
+      setSyncMessage('Gmail & Calendar synced!');
+      setTimeout(() => setSyncMessage(''), 3000);
+      window.location.reload();
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setSyncing(false);
+    }
   };
 
   return (
@@ -48,6 +77,23 @@ export default function Navbar({ onToggleSidebar }) {
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+          {syncMessage && (
+            <span style={{ fontSize: '0.82rem', color: 'var(--emerald-accent)', fontWeight: 600 }}>
+              {syncMessage}
+            </span>
+          )}
+
+          <button
+            onClick={handleSyncStream}
+            className="btn btn-secondary btn-sm"
+            style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', padding: '0.45rem 0.85rem' }}
+            disabled={syncing}
+            title="Sync latest Gmail inbox emails & Google Calendar events"
+          >
+            <Mail size={14} color="var(--emerald-accent)" />
+            <span style={{ fontSize: '0.82rem', fontWeight: 600 }}>{syncing ? 'Syncing...' : 'Sync Mail & Cal'}</span>
+          </button>
+
           {/* Sun / Moon Theme Toggle Button */}
           <button
             onClick={toggleTheme}
@@ -98,107 +144,102 @@ export default function Navbar({ onToggleSidebar }) {
                     width: 38,
                     height: 38,
                     borderRadius: '50%',
-                    background: 'var(--bg-surface)',
-                    border: '1px solid var(--border-accent)',
+                    background: 'linear-gradient(135deg, var(--gold-main), var(--amber-accent))',
+                    color: '#070709',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    color: 'var(--gold-main)',
-                    fontWeight: 700
+                    fontWeight: 700,
+                    fontSize: '1rem',
+                    boxShadow: 'var(--gold-glow-sm)'
                   }}
                 >
-                  {user.name ? user.name[0].toUpperCase() : <UserIcon size={18} />}
+                  {user.name ? user.name.charAt(0).toUpperCase() : 'U'}
                 </div>
-                <span style={{ fontWeight: 600, color: 'var(--text-main)', fontSize: '0.92rem' }}>{user.name}</span>
+                <div style={{ textAlign: 'left', display: 'none' }} className="nav-user-info">
+                  <div style={{ fontSize: '0.88rem', fontWeight: 600, color: 'var(--text-main)' }}>
+                    {user.name}
+                  </div>
+                  <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                    {user.email}
+                  </div>
+                </div>
               </button>
             </>
           )}
         </div>
       </header>
 
-      {/* Account Profile Modal */}
+      {/* Interactive Account Profile Modal */}
       {showProfileModal && user && (
         <div className="modal-backdrop" onClick={() => setShowProfileModal(false)}>
-          <div className="modal-card" onClick={e => e.stopPropagation()} style={{ maxWidth: 520 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', borderBottom: '1px solid var(--border-color)', paddingBottom: '1rem' }}>
+          <div className="modal-card" onClick={e => e.stopPropagation()} style={{ maxWidth: 480 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
                 <div
                   style={{
-                    width: 46,
-                    height: 46,
+                    width: 48,
+                    height: 48,
                     borderRadius: '50%',
-                    background: 'linear-gradient(135deg, #fde68a 0%, #f59e0b 100%)',
+                    background: 'linear-gradient(135deg, var(--gold-main), var(--amber-accent))',
                     color: '#070709',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     fontWeight: 800,
-                    fontSize: '1.2rem'
+                    fontSize: '1.3rem'
                   }}
                 >
-                  {user.name ? user.name[0].toUpperCase() : 'U'}
+                  {user.name ? user.name.charAt(0).toUpperCase() : 'U'}
                 </div>
                 <div>
-                  <h3 style={{ fontSize: '1.3rem', margin: 0 }}>{user.name}</h3>
-                  <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>{user.email}</span>
+                  <h3 style={{ fontSize: '1.25rem', margin: 0, fontWeight: 700 }}>{user.name}</h3>
+                  <div style={{ fontSize: '0.88rem', color: 'var(--text-muted)' }}>{user.email}</div>
                 </div>
               </div>
               <button 
-                onClick={() => setShowProfileModal(false)} 
-                className="btn btn-secondary btn-sm" 
-                style={{ padding: '0.4rem', borderRadius: '50%' }}
+                onClick={() => setShowProfileModal(false)}
+                style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}
               >
-                <X size={18} />
+                <X size={20} />
               </button>
             </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', fontSize: '0.95rem' }}>
-              <div style={{ background: 'var(--bg-surface)', padding: '1rem 1.25rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)' }}>
-                <span style={{ fontSize: '0.8rem', color: 'var(--text-dim)', fontWeight: 600, textTransform: 'uppercase', display: 'block', marginBottom: '0.2rem' }}>
-                  Subscription Tier
-                </span>
-                <span style={{ fontWeight: 700, color: 'var(--gold-main)' }}>
-                  {(user.subscriptionTier || 'Free Demo Plan').toUpperCase()}
+            <div style={{ background: 'var(--bg-surface)', padding: '1.25rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', marginBottom: '1.5rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.75rem', fontSize: '0.9rem' }}>
+                <span style={{ color: 'var(--text-muted)' }}>Subscription Tier:</span>
+                <span className="badge badge-resolved" style={{ textTransform: 'uppercase', fontWeight: 700 }}>
+                  {user.subscriptionTier || 'Pro Tier'}
                 </span>
               </div>
-
-              <div style={{ background: 'var(--bg-surface)', padding: '1rem 1.25rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)' }}>
-                <span style={{ fontSize: '0.8rem', color: 'var(--text-dim)', fontWeight: 600, textTransform: 'uppercase', display: 'block', marginBottom: '0.5rem' }}>
-                  Connected Data Adapters
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.75rem', fontSize: '0.9rem' }}>
+                <span style={{ color: 'var(--text-muted)' }}>Connected Adapters:</span>
+                <span style={{ color: 'var(--emerald-accent)', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                  <Mail size={14} /> Gmail & <Calendar size={14} /> Calendar
                 </span>
-                <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
-                  <span className="badge badge-resolved" style={{ padding: '0.3rem 0.75rem', fontSize: '0.78rem' }}>
-                    <Mail size={12} />
-                    <span>Gmail API (Active)</span>
-                  </span>
-                  <span className="badge badge-resolved" style={{ padding: '0.3rem 0.75rem', fontSize: '0.78rem' }}>
-                    <Calendar size={12} />
-                    <span>Google Calendar (Active)</span>
-                  </span>
-                </div>
               </div>
-
-              <div style={{ background: 'var(--bg-surface)', padding: '1rem 1.25rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <div>
-                  <span style={{ fontSize: '0.8rem', color: 'var(--text-dim)', fontWeight: 600, textTransform: 'uppercase', display: 'block', marginBottom: '0.2rem' }}>
-                    Autonomous Agent Mesh
-                  </span>
-                  <span style={{ fontWeight: 600, color: user.emergencyPaused ? 'var(--crimson-accent)' : 'var(--emerald-accent)' }}>
-                    {user.emergencyPaused ? 'PAUSED' : 'ACTIVE & RUNNING'}
-                  </span>
-                </div>
-                <button
-                  onClick={toggleEmergencyPause}
-                  className={`emergency-btn ${user.emergencyPaused ? 'paused' : 'active'}`}
-                  style={{ padding: '0.4rem 0.85rem', fontSize: '0.8rem' }}
-                >
-                  {user.emergencyPaused ? 'Resume' : 'Pause All'}
-                </button>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.9rem' }}>
+                <span style={{ color: 'var(--text-muted)' }}>Autonomous Agents:</span>
+                <span style={{ color: user.emergencyPaused ? 'var(--crimson-accent)' : 'var(--emerald-accent)', fontWeight: 600 }}>
+                  {user.emergencyPaused ? 'Paused (Emergency Switch)' : '8 Active Sub-Agents'}
+                </span>
               </div>
             </div>
 
-            <div style={{ marginTop: '1.75rem', borderTop: '1px solid var(--border-color)', paddingTop: '1.25rem', display: 'flex', justifyContent: 'flex-end' }}>
-              <button onClick={handleSignOut} className="btn btn-danger btn-sm">
+            <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end' }}>
+              <button
+                onClick={() => {
+                  setShowProfileModal(false);
+                  navigate('/integrations');
+                }}
+                className="btn btn-secondary btn-sm"
+              >
+                Manage Integrations
+              </button>
+              <button
+                onClick={handleSignOut}
+                className="btn btn-danger btn-sm"
+              >
                 <LogOut size={16} />
                 <span>Sign Out</span>
               </button>

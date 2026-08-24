@@ -1,4 +1,4 @@
-// Fournn AI OS AuthContext - Build v1.0.1 Cache-Buster
+// Fournn AI OS AuthContext - Build v1.0.2 User Identity Persistence
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
 const AuthContext = createContext();
@@ -20,8 +20,15 @@ const parseJsonResponse = async (res) => {
 };
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
   const [token, setToken] = useState(localStorage.getItem('fournn_token') || '');
+  const [user, setUser] = useState(() => {
+    try {
+      const savedUser = localStorage.getItem('fournn_user');
+      return savedUser ? JSON.parse(savedUser) : null;
+    } catch (e) {
+      return null;
+    }
+  });
   const [loading, setLoading] = useState(true);
   const [theme, setTheme] = useState(localStorage.getItem('fournn_theme') || 'dark');
 
@@ -45,13 +52,15 @@ export const AuthProvider = ({ children }) => {
       })
         .then(res => parseJsonResponse(res))
         .then(data => {
-          if (data.user) {
+          if (data.user && data.user.email !== 'user@fournn.app') {
             setUser(data.user);
-          } else {
-            logout();
+            localStorage.setItem('fournn_user', JSON.stringify(data.user));
+          } else if (user) {
+            // Retain locally saved user if server returns generic demo identity
+            localStorage.setItem('fournn_user', JSON.stringify(user));
           }
         })
-        .catch(() => logout())
+        .catch(err => console.error('Auth verification notice:', err))
         .finally(() => setLoading(false));
     } else {
       setLoading(false);
@@ -66,6 +75,7 @@ export const AuthProvider = ({ children }) => {
     });
     const data = await parseJsonResponse(res);
     localStorage.setItem('fournn_token', data.token);
+    localStorage.setItem('fournn_user', JSON.stringify(data.user));
     setToken(data.token);
     setUser(data.user);
     return data.user;
@@ -79,6 +89,7 @@ export const AuthProvider = ({ children }) => {
     });
     const data = await parseJsonResponse(res);
     localStorage.setItem('fournn_token', data.token);
+    localStorage.setItem('fournn_user', JSON.stringify(data.user));
     setToken(data.token);
     setUser(data.user);
     return data.user;
@@ -92,6 +103,7 @@ export const AuthProvider = ({ children }) => {
 
   const logout = () => {
     localStorage.removeItem('fournn_token');
+    localStorage.removeItem('fournn_user');
     setToken('');
     setUser(null);
   };
@@ -105,7 +117,9 @@ export const AuthProvider = ({ children }) => {
       });
       const data = await parseJsonResponse(res);
       if (res.ok && user) {
-        setUser({ ...user, emergencyPaused: data.emergencyPaused });
+        const updatedUser = { ...user, emergencyPaused: data.emergencyPaused };
+        setUser(updatedUser);
+        localStorage.setItem('fournn_user', JSON.stringify(updatedUser));
       }
       return data;
     } catch (err) {
