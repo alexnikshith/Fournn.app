@@ -35,6 +35,12 @@ export default function AttentionPage() {
 
   useEffect(() => {
     if (token) fetchItems();
+
+    const handleSyncEvent = () => {
+      fetchItems();
+    };
+    window.addEventListener('fournn_sync_event', handleSyncEvent);
+    return () => window.removeEventListener('fournn_sync_event', handleSyncEvent);
   }, [token]);
 
   const handleClearDemoData = async () => {

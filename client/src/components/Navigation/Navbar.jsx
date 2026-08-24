@@ -53,8 +53,11 @@ export default function Navbar({ onToggleSidebar }) {
         } else {
           setSyncMessage('New Gmail message synced!');
         }
+        // Broadcast custom event so all active page components refresh their lists live
+        window.dispatchEvent(new CustomEvent('fournn_sync_event'));
       } else {
         setSyncMessage('Stream active!');
+        window.dispatchEvent(new CustomEvent('fournn_sync_event'));
       }
       setTimeout(() => setSyncMessage(''), 3000);
     } catch (err) {

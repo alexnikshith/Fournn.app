@@ -68,6 +68,12 @@ export default function DashboardPage() {
 
   useEffect(() => {
     if (token) fetchDashboard();
+
+    const handleSyncEvent = () => {
+      fetchDashboard();
+    };
+    window.addEventListener('fournn_sync_event', handleSyncEvent);
+    return () => window.removeEventListener('fournn_sync_event', handleSyncEvent);
   }, [token]);
 
   const handleReseed = async () => {
