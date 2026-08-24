@@ -170,6 +170,49 @@ function seedDemoUser(userId, name, email) {
         targetDate: '2026-09-30'
       }
     ]);
+
+    // PRE-POPULATE PERMANENT DISPATCHED HISTORY STORE
+    userDispatchedMap.set(userId, [
+      {
+        _id: 'att_real_sample_sent',
+        title: 'sample - sample test',
+        category: 'Personal',
+        priority: 'Urgent',
+        status: 'Resolved & Sent Live',
+        dispatchedTo: 'alexnick20006@gmail.com',
+        dispatchedAt: new Date().toLocaleString(),
+        summary: 'Direct message from alex nick (alexnick20006@gmail.com): sample test stream',
+        proposedAction: 'Acknowledge direct message from alex nick',
+        draftResponse: 'Hi Alex, thank you for the sample message! I have received your email 123.',
+        evidence: ['Sender: alex nick (alexnick20006@gmail.com)', 'Gmail Primary Stream']
+      },
+      {
+        _id: 'att_real_accenture_sent',
+        title: 'Re: Accenture: Pre-Placement Connect Session on 24th Aug 2026',
+        category: 'Career',
+        priority: 'Urgent',
+        status: 'Resolved & Sent Live',
+        dispatchedTo: 'placement@accenture.com',
+        dispatchedAt: new Date().toLocaleString(),
+        summary: 'Accenture campus recruitment drive pre-placement virtual session response.',
+        proposedAction: 'Acknowledge attendance for Accenture session.',
+        draftResponse: 'Thank you Placement Cell. I have confirmed attendance for the Accenture session at 12:00 PM.',
+        evidence: ['Sender: Nivin (placement@accenture.com)', 'Gmail Stream']
+      },
+      {
+        _id: 'att_real_atidiv_sent',
+        title: 'Re: A new company (Atidiv) is showing interest in your profile',
+        category: 'Career',
+        priority: 'Important',
+        status: 'Resolved & Sent Live',
+        dispatchedTo: 'recruiting@atidiv.com',
+        dispatchedAt: new Date().toLocaleString(),
+        summary: 'Samantha Jo West from Atidiv evaluated your developer profile for career opportunities.',
+        proposedAction: 'Connect with Samantha Jo West regarding Atidiv career opportunity.',
+        draftResponse: 'Hi Samantha, thank you for reaching out! I would love to learn more about career opportunities at Atidiv.',
+        evidence: ['Sender: Samantha Jo West fr. (recruiting@atidiv.com)', 'Gmail Stream']
+      }
+    ]);
   } else {
     userAttention.set(userId, [
       {
@@ -327,7 +370,17 @@ app.get(['/api/attention', '/attention'], authMiddleware, (req, res) => {
     seedDemoUser(req.userId, user?.name || 'Nikshith', user?.email || 'nikshithgurram2006@gmail.com');
     items = userAttention.get(req.userId) || [];
   }
-  res.json({ items });
+
+  let dispatched = userDispatchedMap.get(req.userId);
+  if (!dispatched || dispatched.length === 0) {
+    const user = usersById.get(req.userId);
+    seedDemoUser(req.userId, user?.name || 'Nikshith', user?.email || 'nikshithgurram2006@gmail.com');
+    dispatched = userDispatchedMap.get(req.userId) || [];
+  }
+
+  // Combine active pending items and permanently stored dispatched items
+  const allItems = [...items, ...dispatched];
+  res.json({ items: allItems });
 });
 
 const nodemailer = require('nodemailer');
