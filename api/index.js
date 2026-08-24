@@ -10,12 +10,15 @@ app.use(express.json());
 
 const JWT_SECRET = process.env.JWT_SECRET || 'fournn_secret_jwt_production_2026';
 
-// In-Memory Data Store per User
+// In-Memory Data Store per User (with MongoDB Model Backing)
 const users = new Map();
 const usersById = new Map();
 const userAttention = new Map();
 const userDecisions = new Map();
 const userGoals = new Map();
+const userSituations = new Map();
+const userOutcomes = new Map();
+const userTimeline = new Map();
 
 // AI Intelligent Email Categorizer Engine
 function categorizeEmail(subject = '', body = '', sender = '') {
@@ -235,6 +238,121 @@ function seedDemoUser(userId, name, email) {
       evidence: ['Sender: Freelancer (notifications@freelancer.com)', 'Gmail Stream']
     }
   ]);
+
+  // Seed Situations for FOURN Personal Context & Outcome Engine
+  userSituations.set(userId, [
+    {
+      _id: 'sit_accenture_interview',
+      title: 'Accenture Placement Drive & Connect Session',
+      category: 'Career',
+      status: 'ACTIVE',
+      attentionScore: 92,
+      attentionCategory: 'URGENT',
+      attentionFactors: [
+        { factor: 'Deadline Proximity', weight: 40, reason: 'Session scheduled today at 12:00 PM' },
+        { factor: 'Goal Relevance', weight: 35, reason: 'Directly linked to Career Goal: Software Engineering Offer' },
+        { factor: 'Required Action', weight: 17, reason: 'Requires attendance confirmation and calendar review' }
+      ],
+      currentState: 'Pre-placement connect session scheduled virtually for 12:00 PM.',
+      desiredState: 'Secure placement interview shortlist and complete technical round.',
+      nextAction: 'Review pre-placement connect session link and prepare system design notes.',
+      dependencies: ['Accenture Virtual Link', 'Resume PDF', 'System Design Context'],
+      risks: ['Scheduling conflict if session is delayed', 'System design preparation gap'],
+      progress: 65,
+      relatedEntities: ['Accenture', 'Nivin', 'Software Engineering'],
+      outcomeReference: 'out_accenture_offer'
+    },
+    {
+      _id: 'sit_freelance_invoice',
+      title: 'Freelance Milestone Invoice & Payment Recovery',
+      category: 'Financial',
+      status: 'ACTIVE',
+      attentionScore: 78,
+      attentionCategory: 'IMPORTANT',
+      attentionFactors: [
+        { factor: 'Financial Impact', weight: 45, reason: '₹25,000 milestone invoice payment processed' },
+        { factor: 'Goal Relevance', weight: 33, reason: 'Financial Goal: Maintain positive freelance cash flow' }
+      ],
+      currentState: 'Milestone invoice of ₹25,000 processed and credited.',
+      desiredState: 'Confirm bank deposit arrival and issue client receipt.',
+      nextAction: 'Check bank account statement for ₹25,000 credit confirmation.',
+      dependencies: ['Freelancer Billing', 'Bank Account'],
+      risks: ['Bank processing delay'],
+      progress: 90,
+      relatedEntities: ['Freelancer', 'Bank'],
+      outcomeReference: 'out_refund_25k'
+    },
+    {
+      _id: 'sit_servicenow_workshop',
+      title: 'ServiceNow Administration Fundamentals Workshop',
+      category: 'Education',
+      status: 'ACTIVE',
+      attentionScore: 60,
+      attentionCategory: 'UPCOMING',
+      attentionFactors: [
+        { factor: 'Skill Gap', weight: 30, reason: 'Enhances enterprise platform certification credentials' }
+      ],
+      currentState: 'Registration confirmed for NDLI ServiceNow workshop.',
+      desiredState: 'Complete workshop session and obtain official certificate.',
+      nextAction: 'Add workshop schedule block to Google Calendar.',
+      dependencies: ['NDLI Club', 'ServiceNow Portal'],
+      risks: ['Assignment collision'],
+      progress: 40,
+      relatedEntities: ['NDLI Club', 'ServiceNow']
+    }
+  ]);
+
+  userOutcomes.set(userId, [
+    {
+      _id: 'out_accenture_offer',
+      title: 'Software Engineering Job Offer @ Accenture',
+      currentState: 'Pre-placement virtual session completed.',
+      desiredState: 'Receive formal placement offer letter with start date.',
+      progress: 65,
+      status: 'IN_PROGRESS',
+      probability: 80,
+      impact: 'HIGH',
+      targetDate: new Date('2026-09-15')
+    },
+    {
+      _id: 'out_refund_25k',
+      title: 'Receive ₹25,000 Freelance Milestone Payment',
+      currentState: 'Invoice processed by payment processor.',
+      desiredState: '₹25,000 credited to bank account.',
+      progress: 90,
+      status: 'IN_PROGRESS',
+      probability: 95,
+      impact: 'HIGH',
+      targetDate: new Date('2026-08-26')
+    }
+  ]);
+
+  userTimeline.set(userId, [
+    {
+      _id: 'evt_1',
+      situationId: 'sit_accenture_interview',
+      eventType: 'EMAIL_RECEIVED',
+      title: 'Accenture Placement Connect Invitation Received',
+      description: 'Nivin from Accenture sent pre-placement virtual session link.',
+      timestamp: new Date('2026-08-24T09:00:00')
+    },
+    {
+      _id: 'evt_2',
+      situationId: 'sit_accenture_interview',
+      eventType: 'INTERVIEW_SCHEDULED',
+      title: 'Virtual Connect Session Scheduled for 12:00 PM',
+      description: 'Event set in Google Calendar for 24th Aug 2026 @ 12:00 PM IST.',
+      timestamp: new Date('2026-08-24T09:15:00')
+    },
+    {
+      _id: 'evt_3',
+      situationId: 'sit_freelance_invoice',
+      eventType: 'EMAIL_RECEIVED',
+      title: 'Payment Invoice ₹25,000 Received',
+      description: 'Milestone payment invoice credited via Freelancer Billing.',
+      timestamp: new Date('2026-08-24T18:30:00')
+    }
+  ]);
 }
 
 // DB Connection Manager with serverless connection pooling
@@ -380,6 +498,47 @@ app.get(['/api/attention', '/attention'], authMiddleware, (req, res) => {
     items = userAttention.get(req.userId) || [];
   }
   res.json({ items });
+});
+
+// 4. SITUATIONS & OUTCOMES (FOURN Engine)
+app.get(['/api/situations', '/situations'], authMiddleware, (req, res) => {
+  let situations = userSituations.get(req.userId);
+  if (!situations || !Array.isArray(situations) || situations.length === 0) {
+    const user = usersById.get(req.userId);
+    seedDemoUser(req.userId, user?.name || 'Nikshith', user?.email || 'nikshithgurram2006@gmail.com');
+    situations = userSituations.get(req.userId) || [];
+  }
+  res.json({ situations });
+});
+
+app.get(['/api/situations/:id', '/situations/:id'], authMiddleware, (req, res) => {
+  let situations = userSituations.get(req.userId) || [];
+  const target = situations.find(s => s._id === req.params.id);
+  if (!target) return res.status(404).json({ error: 'Situation not found' });
+  
+  // Attach related timeline events
+  const timeline = (userTimeline.get(req.userId) || []).filter(e => e.situationId === req.params.id);
+  res.json({ situation: { ...target, timeline } });
+});
+
+app.get(['/api/outcomes', '/outcomes'], authMiddleware, (req, res) => {
+  let outcomes = userOutcomes.get(req.userId);
+  if (!outcomes || !Array.isArray(outcomes) || outcomes.length === 0) {
+    const user = usersById.get(req.userId);
+    seedDemoUser(req.userId, user?.name || 'Nikshith', user?.email || 'nikshithgurram2006@gmail.com');
+    outcomes = userOutcomes.get(req.userId) || [];
+  }
+  res.json({ outcomes });
+});
+
+app.get(['/api/timeline', '/timeline'], authMiddleware, (req, res) => {
+  let events = userTimeline.get(req.userId);
+  if (!events || !Array.isArray(events) || events.length === 0) {
+    const user = usersById.get(req.userId);
+    seedDemoUser(req.userId, user?.name || 'Nikshith', user?.email || 'nikshithgurram2006@gmail.com');
+    events = userTimeline.get(req.userId) || [];
+  }
+  res.json({ events });
 });
 
 const nodemailer = require('nodemailer');
