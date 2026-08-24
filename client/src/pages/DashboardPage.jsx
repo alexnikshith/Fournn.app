@@ -47,6 +47,8 @@ const DEFAULT_DASHBOARD_DATA = {
   ]
 };
 
+import ContextDemo from '../components/Demo/ContextDemo';
+
 export default function DashboardPage() {
   const { token, user } = useAuth();
   const [data, setData] = useState(DEFAULT_DASHBOARD_DATA);
@@ -112,11 +114,14 @@ export default function DashboardPage() {
       {/* Header Greeting & World At A Glance */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem', marginBottom: '2rem' }}>
         <div>
+          <div style={{ fontSize: '0.8rem', color: 'var(--gold-main)', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.25rem' }}>
+            FOURN — YOUR PERSONAL CONTEXT ENGINE
+          </div>
           <h1 style={{ fontSize: '2.2rem', fontWeight: 800, marginBottom: '0.25rem' }}>
-            Good evening, {user ? user.name : 'Nikshith'}
+            YOUR WORLD — {user ? user.name : 'Nikshith'}
           </h1>
           <p style={{ color: 'var(--text-muted)', fontSize: '1.05rem' }}>
-            Your world at a glance across goals, commitments, decisions, and agents.
+            Understand. Remember. Decide. Act.
           </p>
         </div>
 
@@ -200,6 +205,9 @@ export default function DashboardPage() {
           </div>
         </div>
       </div>
+
+      {/* Context Engine Interactive Demo */}
+      <ContextDemo />
 
       {/* Main Content Grid */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: '2rem' }}>
