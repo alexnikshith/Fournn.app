@@ -405,12 +405,13 @@ app.post(['/api/attention/:id/execute', '/attention/:id/execute'], authMiddlewar
 
 // 4. DECISIONS & AGENTS ACTIVITY
 app.get(['/api/agents', '/agents'], authMiddleware, (req, res) => {
+  const user = usersById.get(req.userId);
   const runs = userActivity.get(req.userId) || [
     {
       _id: 'act_1',
       agentName: 'ExecutionAgent',
-      action: 'Approved & Dispatched response for: Accenture Placement Session',
-      reason: 'User explicitly approved action in Attention Center review modal',
+      action: 'Real-Time Email Sent to: placement@accenture.com',
+      reason: 'Dispatched pre-placement session confirmation via Real-Time Email Engine',
       userApproved: true,
       timestamp: new Date()
     },
@@ -421,17 +422,29 @@ app.get(['/api/agents', '/agents'], authMiddleware, (req, res) => {
       reason: 'Urgent email stream detected from placement cell',
       userApproved: true,
       timestamp: new Date()
-    },
-    {
-      _id: 'act_3',
-      agentName: 'ContextAgent',
-      action: 'Linked recruiter email to career goal',
-      reason: 'Matched Accenture Connect Session with active placement goal',
-      userApproved: true,
-      timestamp: new Date()
     }
   ];
-  res.json({ recentRuns: runs });
+
+  res.json({
+    emergencyPaused: user ? user.emergencyPaused : false,
+    recentRuns: runs,
+    agents: [
+      { name: 'ExecutionAgent', description: 'Real-Time Email Dispatch Engine & Action Resolution', status: 'Active' },
+      { name: 'FollowUpAgent', description: 'Monitors incoming Gmail messages & placement invites', status: 'Active' },
+      { name: 'ContextAgent', description: 'Maps career commitments to your Personal Context Graph', status: 'Active' },
+      { name: 'DecisionAgent', description: 'Analyzes priority decisions & salary targets', status: 'Active' }
+    ],
+    integrations: [
+      {
+        service: 'gmail',
+        permissions: { readInbox: true, draftReplies: true, autoDispatch: true }
+      },
+      {
+        service: 'calendar',
+        permissions: { readEvents: true, createEvents: true }
+      }
+    ]
+  });
 });
 
 app.get(['/api/activity', '/activity'], authMiddleware, (req, res) => {
