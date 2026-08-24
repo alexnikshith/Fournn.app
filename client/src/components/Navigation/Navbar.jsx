@@ -23,7 +23,12 @@ export default function Navbar({ onToggleSidebar }) {
   const [syncing, setSyncing] = useState(false);
   const [syncMessage, setSyncMessage] = useState('');
 
-  const pageTitle = PAGE_TITLES[location.pathname] || 'Fournn OS';
+  const getPageTitle = (pathname) => {
+    if (pathname.startsWith('/situations/')) return 'Situation Context & Outcome Detail';
+    return PAGE_TITLES[pathname] || 'FOURN Context Engine';
+  };
+
+  const pageTitle = getPageTitle(location.pathname);
 
   const handleSignOut = () => {
     setShowProfileModal(false);
