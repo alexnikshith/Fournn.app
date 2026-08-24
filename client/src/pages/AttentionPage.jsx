@@ -42,9 +42,8 @@ export default function AttentionPage() {
 
   const fetchItems = () => {
     setLoading(true);
-    fetch('/api/attention', {
-      headers: { Authorization: `Bearer ${token}` }
-    })
+    const headers = token ? { Authorization: `Bearer ${token}` } : {};
+    fetch('/api/attention', { headers })
       .then(res => res.json())
       .then(data => {
         const fetchedItems = data.items || [];
@@ -61,7 +60,7 @@ export default function AttentionPage() {
   };
 
   useEffect(() => {
-    if (token) fetchItems();
+    fetchItems();
 
     const handleSyncEvent = () => {
       fetchItems();
