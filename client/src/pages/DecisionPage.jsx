@@ -155,7 +155,7 @@ export default function DecisionPage() {
 
               {/* Options Comparison Table Grid */}
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.25rem', marginBottom: '1.5rem' }}>
-                {dec.options.map((opt, idx) => {
+                {(dec.options || []).map((opt, idx) => {
                   const isRecommended = opt.title === dec.recommendation;
                   const isSelected = dec.selectedOption === opt.title;
 
