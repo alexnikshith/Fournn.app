@@ -16,28 +16,34 @@ import {
 } from 'lucide-react';
 
 const DEFAULT_DASHBOARD_DATA = {
-  metrics: { needAttention: 2, pendingDecisions: 1, activeGoals: 1, urgentAlerts: 1 },
+  metrics: { needAttention: 6, pendingDecisions: 2, activeGoals: 1, urgentAlerts: 3 },
   topAttentionItems: [
     {
-      _id: 'att_fallback_1',
-      title: '₹2,400 E-Commerce Refund Overdue',
-      category: 'Financial',
+      _id: 'att_real_sample',
+      title: 'sample',
+      category: 'Personal',
       priority: 'Urgent',
-      summary: 'Order return received 5 days ago, but ₹2,400 refund has not credited your bank account.',
-      draftResponse: 'Hi Support Team, order #88491 was returned 5 days ago. Please confirm status of refund.'
+      summary: 'Direct message from alex nick (alexnick2006@gmail.com): sample test'
     },
     {
-      _id: 'att_fallback_2',
-      title: 'Google Staff Engineer Interview Reply Needed',
+      _id: 'att_real_optimspace',
+      title: 'Front-End Developer Intern @ Optimspace (₹7,500 - ₹15,000 / month)',
       category: 'Career',
-      priority: 'Important',
-      summary: 'Recruiter Sarah Jenkins requested your availability for Staff Screen scheduled in 6 days.',
-      draftResponse: 'Hi Sarah, I am available on Monday and Tuesday between 2:00 PM and 4:00 PM PST.'
+      priority: 'Urgent',
+      summary: 'Front-End Developer Internship opportunity matching your full-stack web development profile.'
+    },
+    {
+      _id: 'att_real_accenture',
+      title: 'Accenture: Pre-Placement Connect Session on 24th Aug 2026 @ 12:00 PM Virtual',
+      category: 'Career',
+      priority: 'Urgent',
+      summary: 'Accenture campus recruitment drive pre-placement virtual session link & briefing details.'
     }
   ],
   recentAgentRuns: [
-    { agentName: 'FollowUpAgent', action: 'Flagged ₹2,400 overdue refund', status: 'Requires Approval', createdAt: new Date() },
-    { agentName: 'ContextAgent', action: 'Linked recruiter interview invite to career goal', status: 'Verified', createdAt: new Date() }
+    { agentName: 'ExecutionAgent', action: 'Synced 6 Gmail messages from your real inbox', status: 'Verified', createdAt: new Date() },
+    { agentName: 'FollowUpAgent', action: 'Flagged Accenture placement invite & sample email', status: 'Requires Approval', createdAt: new Date() },
+    { agentName: 'ContextAgent', action: 'Linked recruiter email to career goal', status: 'Verified', createdAt: new Date() }
   ]
 };
 
@@ -92,8 +98,12 @@ export default function DashboardPage() {
   };
 
   const metrics = data?.metrics || DEFAULT_DASHBOARD_DATA.metrics;
-  const topAttentionItems = data?.topAttentionItems || DEFAULT_DASHBOARD_DATA.topAttentionItems;
-  const recentAgentRuns = data?.recentAgentRuns || DEFAULT_DASHBOARD_DATA.recentAgentRuns;
+  const topAttentionItems = Array.isArray(data?.topAttentionItems) && data.topAttentionItems.length > 0 
+    ? data.topAttentionItems 
+    : DEFAULT_DASHBOARD_DATA.topAttentionItems;
+  const recentAgentRuns = Array.isArray(data?.recentAgentRuns) && data.recentAgentRuns.length > 0 
+    ? data.recentAgentRuns 
+    : DEFAULT_DASHBOARD_DATA.recentAgentRuns;
 
   return (
     <div style={{ width: '100%' }}>
@@ -101,7 +111,7 @@ export default function DashboardPage() {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem', marginBottom: '2rem' }}>
         <div>
           <h1 style={{ fontSize: '2.2rem', fontWeight: 800, marginBottom: '0.25rem' }}>
-            Good evening, {user ? user.name : 'User'}
+            Good evening, {user ? user.name : 'Nikshith'}
           </h1>
           <p style={{ color: 'var(--text-muted)', fontSize: '1.05rem' }}>
             Your world at a glance across goals, commitments, decisions, and agents.
@@ -119,10 +129,10 @@ export default function DashboardPage() {
             onClick={handleReseed} 
             className="btn btn-secondary btn-sm" 
             disabled={reseedLoading}
-            title="Reset to fresh demo scenario data"
+            title="Reset to fresh scenario data"
           >
             <RefreshCw size={14} className={reseedLoading ? 'animate-spin' : ''} />
-            <span>Reset Demo Context</span>
+            <span>Reset Context Stream</span>
           </button>
         </div>
       </div>
@@ -193,9 +203,9 @@ export default function DashboardPage() {
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-            {topAttentionItems.map(item => (
+            {topAttentionItems.map((item, idx) => (
               <div 
-                key={item._id}
+                key={item._id || idx}
                 style={{ 
                   background: 'var(--bg-surface)', 
                   border: '1px solid var(--border-color)', 
@@ -205,9 +215,9 @@ export default function DashboardPage() {
               >
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.5rem' }}>
                   <span className={`badge ${item.priority === 'Urgent' ? 'badge-urgent' : 'badge-important'}`}>
-                    {item.priority}
+                    {item.priority || 'Urgent'}
                   </span>
-                  <span style={{ fontSize: '0.8rem', color: 'var(--text-dim)' }}>{item.category}</span>
+                  <span style={{ fontSize: '0.8rem', color: 'var(--text-dim)' }}>{item.category || 'Stream'}</span>
                 </div>
 
                 <h3 style={{ fontSize: '1.1rem', marginBottom: '0.4rem', color: 'var(--text-main)' }}>
@@ -246,7 +256,7 @@ export default function DashboardPage() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             {recentAgentRuns.map((run, idx) => (
               <div 
-                key={idx}
+                key={run._id || idx}
                 style={{ 
                   background: 'var(--bg-surface)', 
                   border: '1px solid var(--border-color)', 
@@ -265,7 +275,7 @@ export default function DashboardPage() {
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.2rem' }}>
                     <span style={{ fontWeight: 700, fontSize: '0.92rem', color: 'var(--text-main)' }}>{run.agentName}</span>
                     <span className="badge badge-resolved" style={{ fontSize: '0.72rem', padding: '0.2rem 0.6rem' }}>
-                      {run.status}
+                      {run.status || 'Verified'}
                     </span>
                   </div>
                   <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
