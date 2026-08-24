@@ -139,12 +139,18 @@ export default function AttentionPage() {
   };
 
   const filteredItems = items.filter(item => {
+    const isDispatched = item.status === 'Resolved & Sent Live' || item.status === 'Resolved';
+
+    // DISPATCHED tab shows all resolved/dispatched emails
     if (activeTab === 'dispatched') {
-      return item.status === 'Resolved & Sent Live' || item.status === 'Resolved';
+      return isDispatched;
     }
-    if (activeTab === 'all') {
-      return item.status !== 'Resolved & Sent Live' && item.status !== 'Resolved';
-    }
+
+    // ALL other tabs show active pending emails needing review/dispatch
+    if (isDispatched) return false;
+
+    if (activeTab === 'all') return true;
+
     return (item.category && item.category.toLowerCase() === activeTab.toLowerCase()) || 
            (item.priority && item.priority.toLowerCase() === activeTab.toLowerCase());
   });
@@ -275,15 +281,26 @@ export default function AttentionPage() {
                     ))}
                   </div>
 
-                  {!isDispatched && (
-                    <button 
-                      onClick={() => openReviewModal(item)} 
-                      className="btn btn-primary btn-sm"
-                    >
-                      <Send size={16} />
-                      <span>Review & Dispatch Real Email</span>
-                    </button>
-                  )}
+                  <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
+                    {isDispatched ? (
+                      <button 
+                        onClick={() => openReviewModal(item)} 
+                        className="btn btn-secondary btn-sm"
+                        style={{ borderColor: 'var(--emerald-accent)', color: 'var(--emerald-accent)' }}
+                      >
+                        <Send size={15} />
+                        <span>Re-Send / Follow-Up Email</span>
+                      </button>
+                    ) : (
+                      <button 
+                        onClick={() => openReviewModal(item)} 
+                        className="btn btn-primary btn-sm"
+                      >
+                        <Send size={16} />
+                        <span>Review & Dispatch Real Email</span>
+                      </button>
+                    )}
+                  </div>
                 </div>
               </div>
             );
