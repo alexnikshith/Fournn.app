@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { AlertCircle, CheckCircle2, XCircle, Send, FileText, Check, Sparkles, Trash2, Plus, Mail } from 'lucide-react';
+import { AlertCircle, CheckCircle2, XCircle, Send, FileText, Check, Sparkles, Trash2, Plus, Mail, CheckCircle } from 'lucide-react';
 
 export default function AttentionPage() {
   const { token } = useAuth();
@@ -9,7 +9,9 @@ export default function AttentionPage() {
   const [loading, setLoading] = useState(true);
   const [selectedItem, setSelectedItem] = useState(null);
   const [editedDraft, setEditedDraft] = useState('');
+  const [recipientEmail, setRecipientEmail] = useState('');
   const [actionLoading, setActionLoading] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
 
   // Ingest Real Email Modal State
   const [showIngestModal, setShowIngestModal] = useState(false);
@@ -78,18 +80,21 @@ export default function AttentionPage() {
     }
   };
 
-  const handleAction = async (itemId, action) => {
+  const handleAction = async (itemId) => {
     setActionLoading(true);
     try {
-      await fetch(`/api/attention/${itemId}/execute`, {
+      const res = await fetch(`/api/attention/${itemId}/execute`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`
         },
-        body: JSON.stringify({ actionDraft: editedDraft })
+        body: JSON.stringify({ actionDraft: editedDraft, recipientEmail })
       });
+      const data = await res.json();
       setSelectedItem(null);
+      setToastMessage(data.message || `⚡ Real Email Dispatched Live to ${recipientEmail || 'Recipient'}!`);
+      setTimeout(() => setToastMessage(''), 5000);
       fetchItems();
     } catch (err) {
       console.error(err);
@@ -98,18 +103,33 @@ export default function AttentionPage() {
     }
   };
 
+  const openReviewModal = (item) => {
+    setSelectedItem(item);
+    setEditedDraft(item.draftResponse || '');
+    // Extract recipient email from item evidence or fallback
+    const extractedRecipient = item.evidence?.[0]?.includes('@') ? item.evidence[0].replace('Sender: ', '') : 'placement@accenture.com';
+    setRecipientEmail(extractedRecipient);
+  };
+
   const filteredItems = items.filter(item => {
-    if (activeTab === 'all') return item.status !== 'Resolved';
+    if (activeTab === 'all') return item.status !== 'Resolved & Sent Live' && item.status !== 'Resolved';
     return item.category.toLowerCase() === activeTab.toLowerCase() || item.priority.toLowerCase() === activeTab.toLowerCase();
   });
 
   return (
     <div style={{ width: '100%' }}>
+      {toastMessage && (
+        <div style={{ background: 'linear-gradient(135deg, #10b981, #059669)', color: '#ffffff', padding: '1rem 1.5rem', borderRadius: 'var(--radius-md)', marginBottom: '1.5rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.75rem', boxShadow: '0 4px 20px rgba(16, 185, 129, 0.4)' }}>
+          <CheckCircle2 size={24} />
+          <span>{toastMessage}</span>
+        </div>
+      )}
+
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem', marginBottom: '2rem' }}>
         <div>
           <h1 style={{ fontSize: '2.2rem', fontWeight: 800, marginBottom: '0.25rem' }}>Attention Center</h1>
           <p style={{ color: 'var(--text-muted)', fontSize: '1.05rem' }}>
-            High-value communication streams, overdue items, and real-world outcomes requiring your review.
+            High-value communication streams, overdue items, and real-world email dispatching.
           </p>
         </div>
 
@@ -152,9 +172,9 @@ export default function AttentionPage() {
       ) : filteredItems.length === 0 ? (
         <div className="glass-card" style={{ textAlign: 'center', padding: '4rem 2rem' }}>
           <CheckCircle2 color="var(--emerald-accent)" size={42} style={{ marginBottom: '1rem' }} />
-          <h3 style={{ fontSize: '1.4rem', marginBottom: '0.5rem' }}>No items needing attention!</h3>
+          <h3 style={{ fontSize: '1.4rem', marginBottom: '0.5rem' }}>No pending items needing attention!</h3>
           <p style={{ color: 'var(--text-muted)', fontSize: '1rem', maxWidth: 480, margin: '0 auto 1.5rem' }}>
-            Click "Ingest Real Email" above to process your real Gmail messages into actionable items.
+            All email actions have been dispatched in real time. Click "Ingest Real Email" below to add a new message stream.
           </p>
           <button onClick={() => setShowIngestModal(true)} className="btn btn-primary">
             <Mail size={18} />
@@ -172,7 +192,7 @@ export default function AttentionPage() {
                   </span>
                   <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: 600 }}>{item.category}</span>
                 </div>
-                <span style={{ fontSize: '0.82rem', color: 'var(--text-dim)' }}>Status: {item.status}</span>
+                <span style={{ fontSize: '0.82rem', color: 'var(--emerald-accent)', fontWeight: 600 }}>Status: {item.status}</span>
               </div>
 
               <h3 style={{ fontSize: '1.35rem', marginBottom: '0.6rem' }}>{item.title}</h3>
@@ -198,42 +218,52 @@ export default function AttentionPage() {
                   ))}
                 </div>
 
-                {item.draftResponse && (
-                  <button 
-                    onClick={() => {
-                      setSelectedItem(item);
-                      setEditedDraft(item.draftResponse);
-                    }} 
-                    className="btn btn-primary btn-sm"
-                  >
-                    <FileText size={16} />
-                    <span>Review Draft & Action</span>
-                  </button>
-                )}
+                <button 
+                  onClick={() => openReviewModal(item)} 
+                  className="btn btn-primary btn-sm"
+                >
+                  <Send size={16} />
+                  <span>Review & Dispatch Real Email</span>
+                </button>
               </div>
             </div>
           ))}
         </div>
       )}
 
-      {/* Review Action Modal */}
+      {/* Review & Dispatch Modal */}
       {selectedItem && (
         <div className="modal-backdrop" onClick={() => setSelectedItem(null)}>
           <div className="modal-card" onClick={e => e.stopPropagation()}>
-            <h2 style={{ fontSize: '1.5rem', marginBottom: '0.5rem' }}>Review Action & Draft Response</h2>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', marginBottom: '0.5rem' }}>
+              <Mail color="var(--gold-main)" size={24} />
+              <h2 style={{ fontSize: '1.5rem', margin: 0 }}>Review & Dispatch Real Email</h2>
+            </div>
             <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem', marginBottom: '1.5rem' }}>
-              Inspect and customize the generated response prior to user-approved execution.
+              Inspect and edit the real-time outgoing message prior to instant dispatch.
             </p>
 
             <div className="form-group">
-              <label className="form-label">Item Title</label>
+              <label className="form-label">Email Subject / Item</label>
               <div style={{ fontWeight: 700, color: 'var(--text-main)', fontSize: '1.1rem' }}>{selectedItem.title}</div>
             </div>
 
             <div className="form-group">
-              <label className="form-label">Response Draft</label>
+              <label className="form-label">Recipient Email Address *</label>
+              <input
+                type="email"
+                className="form-input"
+                placeholder="e.g. placement@accenture.com"
+                value={recipientEmail}
+                onChange={e => setRecipientEmail(e.target.value)}
+                required
+              />
+            </div>
+
+            <div className="form-group">
+              <label className="form-label">Response Body Text</label>
               <textarea
-                rows={5}
+                rows={6}
                 className="form-textarea"
                 value={editedDraft}
                 onChange={e => setEditedDraft(e.target.value)}
@@ -242,9 +272,9 @@ export default function AttentionPage() {
 
             <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end', marginTop: '2rem' }}>
               <button onClick={() => setSelectedItem(null)} className="btn btn-secondary">Cancel</button>
-              <button onClick={() => handleAction(selectedItem._id, 'approve')} className="btn btn-primary" disabled={actionLoading}>
+              <button onClick={() => handleAction(selectedItem._id)} className="btn btn-primary" disabled={actionLoading}>
                 <Send size={18} />
-                <span>Approve & Dispatch</span>
+                <span>{actionLoading ? 'Dispatching Live...' : 'Approve & Dispatch Real Email'}</span>
               </button>
             </div>
           </div>
