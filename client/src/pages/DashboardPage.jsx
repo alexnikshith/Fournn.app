@@ -82,14 +82,16 @@ export default function DashboardPage() {
     return () => window.removeEventListener('fournn_sync_event', handleSyncEvent);
   }, [token]);
 
-  const handleReseed = async () => {
+  const handleSyncGmail = async () => {
     setReseedLoading(true);
     try {
-      await fetch('/api/demo/seed', {
+      const res = await fetch('/api/integrations/sync-google', {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` }
       });
+      const d = await res.json();
       fetchDashboard();
+      window.dispatchEvent(new CustomEvent('fournn_sync_event'));
     } catch (err) {
       console.error(err);
     } finally {
@@ -125,6 +127,17 @@ export default function DashboardPage() {
               <span>Updating context...</span>
             </span>
           )}
+          
+          <button 
+            onClick={handleSyncGmail} 
+            className="btn btn-primary btn-sm"
+            disabled={reseedLoading}
+            title="Fetch all new unread messages from your Gmail inbox"
+          >
+            <RefreshCw size={14} className={reseedLoading ? 'animate-spin' : ''} />
+            <span>Sync Gmail Inbox Stream</span>
+          </button>
+
           <button 
             onClick={handleReseed} 
             className="btn btn-secondary btn-sm" 

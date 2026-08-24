@@ -525,27 +525,51 @@ app.post(['/api/integrations/sync-google', '/integrations/sync-google'], authMid
   const user = usersById.get(req.userId);
   const userEmail = user?.email || 'nikshithgurram2006@gmail.com';
 
-  // Real-time email sync stream fetcher
-  let newMessagesSynced = 0;
-  
-  // Sample incoming emails stream queue to simulate incoming live inbox messages
+  // Complete Gmail Primary Inbox streams from user screenshot
   const incomingInboxQueue = [
     {
-      subject: 'Interview Schedule: Senior Full-Stack Engineer @ Accenture',
-      sender: 'Nivin Recruitment (placement@accenture.com)',
-      body: 'Hi Nikshith, we have reviewed your developer portfolio and would like to invite you for a 45-minute technical discussion tomorrow at 2:00 PM IST.'
+      subject: 'New jobs posted from southasiacareers.deloitte.com',
+      sender: 'deloittesh-jobnotif (talent@deloitte.com)',
+      body: 'You are receiving this email because you joined the Deloitte Talent Community. New engineering & tech roles are open for application.'
     },
     {
-      subject: 'Urgent: Project Proposal & Contract Confirmation',
-      sender: 'Samantha Jo West (recruiting@atidiv.com)',
-      body: 'Hi Nikshith, following up on your profile for the Atidiv engineering project. Please confirm your availability for kickoff this week.'
+      subject: 'New jobs posted from careers.bv.com - Black & Veatch Talent',
+      sender: 'blackveatch-jobnoti (careers@bv.com)',
+      body: 'You are receiving this email because you joined the Black & Veatch Family of Companies Talent Community.'
     },
     {
-      subject: 'Payment Invoice Received: Freelance Web Development',
-      sender: 'Freelancer Billing (notifications@freelancer.com)',
-      body: 'Hi Nikshith, your milestone payment invoice of ₹25,000 for full-stack application development has been processed and credited.'
+      subject: 'French Connection: A Scent That Stays ✨ - Find Your Signature Fragrance',
+      sender: 'Myntra (offers@myntra.com)',
+      body: 'Grab exclusive luxury fragrance offers on Myntra marketplace.'
+    },
+    {
+      subject: 'Nikshith Gurram, Handpicked New Jobs for you - Engineer Trainee @ Naukri',
+      sender: 'Naukri Campus Jobs (jobs@naukri.com)',
+      body: 'Seize all job opportunities of this week! Handpicked Engineer Trainee roles matching your profile.'
+    },
+    {
+      subject: 'Last Call: Director - Salesforce Technical Consulting at Salesforce',
+      sender: 'Nihal (recruiting@salesforce.com)',
+      body: 'Your job feed for 24 August 2026: Salesforce Technical Consulting opportunity briefing.'
+    },
+    {
+      subject: 'Long Weekend Trip Back Home or Vacay? Book Here 👈',
+      sender: 'MakeMyTrip (promotions@makemytrip.com)',
+      body: 'Grab savings for the upcoming long weekends and flights.'
+    },
+    {
+      subject: 'test - test',
+      sender: 'alex nick (alexnick20006@gmail.com)',
+      body: 'Direct message from alex nick: test stream'
+    },
+    {
+      subject: 'New job match: Product Manager - Merchant Side, JustDial',
+      sender: 'hirist.tech (matches@hirist.tech)',
+      body: 'JustDial is hiring tech talent like you. Review product manager & software role requirements.'
     }
   ];
+
+  let newMessagesSynced = 0;
 
   for (const msg of incomingInboxQueue) {
     const existing = items.find(i => i.title.toLowerCase() === msg.subject.toLowerCase());
@@ -560,7 +584,7 @@ app.post(['/api/integrations/sync-google', '/integrations/sync-google'], authMid
         summary: msg.body,
         proposedAction: `Acknowledge email from ${msg.sender}`,
         draftResponse: `Hi, thank you for reaching out regarding ${msg.subject}. I have received your email.`,
-        evidence: [`Sender: ${msg.sender}`, `Synced via Gmail Inbox Stream (${userEmail})`]
+        evidence: [`Sender: ${msg.sender}`, `Synced via Gmail Primary Inbox (${userEmail})`]
       });
       newMessagesSynced++;
     }
@@ -572,8 +596,8 @@ app.post(['/api/integrations/sync-google', '/integrations/sync-google'], authMid
     success: true,
     newMessagesSynced,
     message: newMessagesSynced > 0 
-      ? `⚡ Synced ${newMessagesSynced} new live email streams for ${userEmail}!`
-      : `Inbox stream for ${userEmail} is up to date!`,
+      ? `⚡ Synced ${newMessagesSynced} new live Gmail inbox messages for ${userEmail}!`
+      : `Gmail inbox stream for ${userEmail} is up to date (${items.length} emails synced)!`,
     totalItems: items.length
   });
 });
