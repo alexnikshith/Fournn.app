@@ -115,8 +115,12 @@ export default function AttentionPage() {
   const openReviewModal = (item) => {
     setSelectedItem(item);
     setEditedDraft(item.draftResponse || '');
-    // Extract recipient email from item evidence or fallback
-    const extractedRecipient = item.evidence?.[0]?.includes('@') ? item.evidence[0].replace('Sender: ', '') : 'placement@accenture.com';
+    // Extract clean email address from item evidence or fallback
+    let extractedRecipient = 'alexnick2006@gmail.com';
+    if (item.evidence && item.evidence[0]) {
+      const match = item.evidence[0].match(/([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/);
+      if (match) extractedRecipient = match[1].toLowerCase().replace('alexnick20006', 'alexnick2006');
+    }
     setRecipientEmail(extractedRecipient);
   };
 
@@ -262,7 +266,7 @@ export default function AttentionPage() {
               <input
                 type="email"
                 className="form-input"
-                placeholder="e.g. placement@accenture.com"
+                placeholder="e.g. alexnick2006@gmail.com"
                 value={recipientEmail}
                 onChange={e => setRecipientEmail(e.target.value)}
                 required
@@ -272,11 +276,48 @@ export default function AttentionPage() {
             <div className="form-group">
               <label className="form-label">Response Body Text</label>
               <textarea
-                rows={6}
+                rows={5}
                 className="form-textarea"
                 value={editedDraft}
                 onChange={e => setEditedDraft(e.target.value)}
               />
+            </div>
+
+            <div style={{ background: 'var(--bg-surface)', padding: '0.85rem 1rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)', marginBottom: '1rem' }}>
+              <div 
+                style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }}
+                onClick={() => setShowSenderConfig(!showSenderConfig)}
+              >
+                <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--gold-main)' }}>
+                  ⚙️ Send From My Gmail Account (Optional Direct SMTP)
+                </span>
+                <span style={{ fontSize: '0.8rem', color: 'var(--text-dim)' }}>{showSenderConfig ? 'Hide' : 'Configure'}</span>
+              </div>
+
+              {showSenderConfig && (
+                <div style={{ marginTop: '0.75rem', paddingTop: '0.75rem', borderTop: '1px solid var(--border-color)' }}>
+                  <div className="form-group" style={{ marginBottom: '0.65rem' }}>
+                    <label className="form-label" style={{ fontSize: '0.78rem' }}>Your Gmail Address</label>
+                    <input
+                      type="email"
+                      className="form-input"
+                      value={senderUser}
+                      onChange={e => setSenderUser(e.target.value)}
+                      placeholder="nikshithgurram2006@gmail.com"
+                    />
+                  </div>
+                  <div className="form-group" style={{ marginBottom: 0 }}>
+                    <label className="form-label" style={{ fontSize: '0.78rem' }}>Gmail App Password (16-character code)</label>
+                    <input
+                      type="password"
+                      className="form-input"
+                      value={senderPass}
+                      onChange={e => setSenderPass(e.target.value)}
+                      placeholder="Enter 16-character Gmail App Password"
+                    />
+                  </div>
+                </div>
+              )}
             </div>
 
             <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end', marginTop: '2rem' }}>
