@@ -1,6 +1,4 @@
-import React, { useState, useEffect } from 'react';
-import { useAuth } from '../contexts/AuthContext';
-import { GitPullRequest, Plus, CheckCircle2, AlertTriangle, ShieldCheck, Sparkles } from 'lucide-react';
+import WeeklyReport from '../components/Intelligence/WeeklyReport';
 
 export default function DecisionPage() {
   const { token } = useAuth();
@@ -77,11 +75,13 @@ export default function DecisionPage() {
 
   return (
     <div>
+      <WeeklyReport decisions={decisions} />
+
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem', flexWrap: 'wrap', gap: '1rem' }}>
         <div>
-          <h1 style={{ fontSize: '2rem', fontWeight: 800 }}>Decision Center</h1>
+          <h1 style={{ fontSize: '2rem', fontWeight: 800 }}>Decision Intelligence Center</h1>
           <p style={{ color: 'var(--text-muted)' }}>
-            AI-assisted analysis evaluating choices, trade-offs, evidence, and risk profiles.
+            Structured trade-off evaluation explicitly separating Fact, Inference, Recommendation, and Unknowns.
           </p>
         </div>
 
@@ -124,6 +124,29 @@ export default function DecisionPage() {
                   <div style={{ fontSize: '0.8rem', color: 'var(--emerald-accent)', marginTop: '0.15rem' }}>
                     Confidence: {Math.round((dec.confidence || 0.8) * 100)}%
                   </div>
+                </div>
+              </div>
+
+              {/* FACT / INFERENCE / RECOMMENDATION / UNKNOWN Classification Grid */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1rem', marginBottom: '1.5rem' }}>
+                <div style={{ background: 'rgba(52, 211, 153, 0.08)', border: '1px solid rgba(52, 211, 153, 0.2)', padding: '0.85rem', borderRadius: 'var(--radius-sm)' }}>
+                  <div style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--emerald-accent)', marginBottom: '0.3rem' }}>✓ FACT (VERIFIED DATA)</div>
+                  <div style={{ fontSize: '0.85rem', color: 'var(--text-main)' }}>{dec.biggestAdvantage || 'Verified price and hardware specs from store.'}</div>
+                </div>
+
+                <div style={{ background: 'rgba(251, 191, 36, 0.08)', border: '1px solid rgba(251, 191, 36, 0.2)', padding: '0.85rem', borderRadius: 'var(--radius-sm)' }}>
+                  <div style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--gold-main)', marginBottom: '0.3rem' }}>⚡ INFERENCE (CONTEXT)</div>
+                  <div style={{ fontSize: '0.85rem', color: 'var(--text-main)' }}>{dec.triggerCondition || 'Inferred high performance fit for AI model training.'}</div>
+                </div>
+
+                <div style={{ background: 'rgba(99, 102, 241, 0.08)', border: '1px solid rgba(99, 102, 241, 0.2)', padding: '0.85rem', borderRadius: 'var(--radius-sm)' }}>
+                  <div style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--primary-accent)', marginBottom: '0.3rem' }}>🎯 RECOMMENDATION</div>
+                  <div style={{ fontSize: '0.85rem', color: 'var(--text-main)' }}>{dec.recommendation}</div>
+                </div>
+
+                <div style={{ background: 'rgba(244, 63, 94, 0.08)', border: '1px solid rgba(244, 63, 94, 0.2)', padding: '0.85rem', borderRadius: 'var(--radius-sm)' }}>
+                  <div style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--crimson-accent)', marginBottom: '0.3rem' }}>❓ UNKNOWN (MISSING DATA)</div>
+                  <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Long-term battery degradation under sustained ML load.</div>
                 </div>
               </div>
 
@@ -174,24 +197,6 @@ export default function DecisionPage() {
                     </div>
                   );
                 })}
-              </div>
-
-              {/* Tradeoff Breakdown Details */}
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', background: 'var(--bg-dark)', padding: '1rem', borderRadius: 'var(--radius-sm)', fontSize: '0.85rem' }}>
-                <div>
-                  <strong style={{ color: 'var(--emerald-accent)', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
-                    <ShieldCheck size={14} />
-                    <span>Biggest Advantage</span>
-                  </strong>
-                  <p style={{ marginTop: '0.25rem', color: 'var(--text-main)' }}>{dec.biggestAdvantage}</p>
-                </div>
-                <div>
-                  <strong style={{ color: 'var(--amber-accent)', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
-                    <AlertTriangle size={14} />
-                    <span>Trigger Condition</span>
-                  </strong>
-                  <p style={{ marginTop: '0.25rem', color: 'var(--text-muted)' }}>{dec.triggerCondition}</p>
-                </div>
               </div>
             </div>
           ))}
