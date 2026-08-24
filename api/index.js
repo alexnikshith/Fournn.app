@@ -56,10 +56,10 @@ function seedDemoUser(userId, name, email) {
         category: 'Personal',
         priority: 'Urgent',
         status: 'Pending Review',
-        summary: 'Direct message from alex nick (alexnick2006@gmail.com): sample test stream',
+        summary: 'Direct message from alex nick (alexnick20006@gmail.com): sample test stream',
         proposedAction: 'Acknowledge direct message from alex nick',
         draftResponse: 'Hi Alex, thank you for the sample message! I have received your email.',
-        evidence: ['Sender: alex nick (alexnick2006@gmail.com)', 'Gmail Primary Stream']
+        evidence: ['Sender: alex nick (alexnick20006@gmail.com)', 'Gmail Primary Stream']
       },
       {
         _id: 'att_real_optimspace_' + Date.now(),
@@ -335,18 +335,15 @@ const dns = require('dns').promises;
 
 const userActivity = new Map();
 
-// Helper to extract clean email address from strings like "alex nick (alexnick2006@gmail.com)"
+// Helper to extract exact clean email address without altering characters
 function extractCleanEmail(inputStr) {
-  if (!inputStr) return 'alexnick2006@gmail.com';
+  if (!inputStr) return 'alexnick20006@gmail.com';
   // Match standard email pattern
   const match = inputStr.match(/([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/);
   if (match) {
-    let email = match[1].toLowerCase();
-    // Fix common extra zero typo: alexnick20006 -> alexnick2006
-    email = email.replace('alexnick20006@gmail.com', 'alexnick2006@gmail.com');
-    return email;
+    return match[1].toLowerCase();
   }
-  return 'alexnick2006@gmail.com';
+  return 'alexnick20006@gmail.com';
 }
 
 // Real-Time Transporter & Direct Resolution Sender

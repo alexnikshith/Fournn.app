@@ -115,11 +115,11 @@ export default function AttentionPage() {
   const openReviewModal = (item) => {
     setSelectedItem(item);
     setEditedDraft(item.draftResponse || '');
-    // Extract clean email address from item evidence or fallback
-    let extractedRecipient = 'alexnick2006@gmail.com';
+    // Extract exact clean email address from item evidence or fallback
+    let extractedRecipient = 'alexnick20006@gmail.com';
     if (item.evidence && item.evidence[0]) {
       const match = item.evidence[0].match(/([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/);
-      if (match) extractedRecipient = match[1].toLowerCase().replace('alexnick20006', 'alexnick2006');
+      if (match) extractedRecipient = match[1].toLowerCase();
     }
     setRecipientEmail(extractedRecipient);
   };
