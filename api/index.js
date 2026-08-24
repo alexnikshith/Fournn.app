@@ -275,16 +275,26 @@ app.post(['/api/demo/clear', '/demo/clear'], authMiddleware, (req, res) => {
 app.post(['/api/integrations/ingest-email', '/integrations/ingest-email'], authMiddleware, (req, res) => {
   const { subject, sender, body } = req.body;
   const items = userAttention.get(req.userId) || [];
+  
+  const title = subject || 'New Email Stream';
+
+  // Deduplication check: Do not add if an item with exact same title already exists
+  const existingItem = items.find(item => item.title === title || item.title.toLowerCase() === title.toLowerCase());
+  if (existingItem) {
+    return res.json({ success: true, duplicated: true, item: existingItem, message: 'Email item already synced in Attention Center.' });
+  }
+
   const newItem = {
     _id: 'att_real_' + Date.now(),
-    title: subject || 'New Email',
+    title,
     category: 'Career',
-    priority: subject?.toLowerCase().includes('urgent') || subject?.toLowerCase().includes('accenture') ? 'Urgent' : 'Important',
+    priority: title.toLowerCase().includes('urgent') || title.toLowerCase().includes('accenture') ? 'Urgent' : 'Important',
     status: 'Pending Review',
-    summary: body || `Email from ${sender || 'Gmail Stream'}: ${subject}`,
-    proposedAction: `Acknowledge email for ${subject}`,
-    draftResponse: `Thank you for sharing updates regarding ${subject}. I have noted the details.`
+    summary: body || `Email from ${sender || 'Gmail Stream'}: ${title}`,
+    proposedAction: `Acknowledge email for ${title}`,
+    draftResponse: `Thank you for sharing updates regarding ${title}. I have noted the details.`
   };
+
   items.unshift(newItem);
   userAttention.set(req.userId, items);
   res.json({ success: true, item: newItem });

@@ -35,7 +35,7 @@ export default function Navbar({ onToggleSidebar }) {
     setSyncing(true);
     try {
       if (token) {
-        await fetch('/api/integrations/ingest-email', {
+        const res = await fetch('/api/integrations/ingest-email', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -47,10 +47,16 @@ export default function Navbar({ onToggleSidebar }) {
             body: 'Accenture campus recruitment drive pre-placement virtual session link & briefing details.'
           })
         });
+        const data = await res.json();
+        if (data.duplicated) {
+          setSyncMessage('Inbox stream is up to date!');
+        } else {
+          setSyncMessage('New Gmail message synced!');
+        }
+      } else {
+        setSyncMessage('Stream active!');
       }
-      setSyncMessage('Gmail & Calendar synced!');
       setTimeout(() => setSyncMessage(''), 3000);
-      window.location.reload();
     } catch (err) {
       console.error(err);
     } finally {
