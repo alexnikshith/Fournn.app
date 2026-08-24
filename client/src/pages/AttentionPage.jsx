@@ -10,6 +10,9 @@ export default function AttentionPage() {
   const [selectedItem, setSelectedItem] = useState(null);
   const [editedDraft, setEditedDraft] = useState('');
   const [recipientEmail, setRecipientEmail] = useState('');
+  const [senderUser, setSenderUser] = useState('nikshithgurram2006@gmail.com');
+  const [senderPass, setSenderPass] = useState('');
+  const [showSenderConfig, setShowSenderConfig] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
 
@@ -95,12 +98,12 @@ export default function AttentionPage() {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`
         },
-        body: JSON.stringify({ actionDraft: editedDraft, recipientEmail })
+        body: JSON.stringify({ actionDraft: editedDraft, recipientEmail, senderUser, senderPass })
       });
       const data = await res.json();
       setSelectedItem(null);
       setToastMessage(data.message || `⚡ Real Email Dispatched Live to ${recipientEmail || 'Recipient'}!`);
-      setTimeout(() => setToastMessage(''), 5000);
+      setTimeout(() => setToastMessage(''), 7000);
       fetchItems();
     } catch (err) {
       console.error(err);
