@@ -17,6 +17,7 @@ import AgentsPage from './pages/AgentsPage';
 import ActivityPage from './pages/ActivityPage';
 import MemoryPage from './pages/MemoryPage';
 import SituationDetailPage from './pages/SituationDetailPage';
+import IntegrationsSettingsPage from './pages/IntegrationsSettingsPage';
 
 function ProtectedLayout({ children }) {
   const { user, loading } = useAuth();
