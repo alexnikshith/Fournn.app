@@ -100,6 +100,22 @@ export default function DashboardPage() {
     }
   };
 
+  const handleReseed = async () => {
+    setReseedLoading(true);
+    try {
+      await fetch('/api/auth/demo', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: user?.email || 'nikshithgurram2006@gmail.com', name: user?.name || 'Nikshith' })
+      });
+      fetchDashboard();
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setReseedLoading(false);
+    }
+  };
+
   const metrics = data?.metrics || DEFAULT_DASHBOARD_DATA.metrics;
   const topAttentionItems = Array.isArray(data?.topAttentionItems) && data.topAttentionItems.length > 0 
     ? data.topAttentionItems 
