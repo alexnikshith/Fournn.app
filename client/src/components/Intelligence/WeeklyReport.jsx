@@ -1,5 +1,5 @@
 import React from 'react';
-import { Calendar, CheckCircle2, AlertTriangle, HelpCircle, ArrowRight, Sparkles, ShieldAlert } from 'lucide-react';
+import { Calendar, CheckCircle2, AlertTriangle, HelpCircle, ArrowRight, Sparkles, ShieldAlert, Target } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export default function WeeklyReport({ situations = [], outcomes = [], decisions = [] }) {
