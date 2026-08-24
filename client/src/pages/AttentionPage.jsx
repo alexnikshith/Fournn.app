@@ -101,10 +101,24 @@ export default function AttentionPage() {
         body: JSON.stringify({ actionDraft: editedDraft, recipientEmail, senderUser, senderPass })
       });
       const data = await res.json();
+
+      // Update local state immediately with exact user-edited draft response
+      setItems(prev => prev.map(item => {
+        if (item._id === itemId) {
+          return {
+            ...item,
+            status: 'Resolved & Sent Live',
+            draftResponse: editedDraft,
+            dispatchedTo: recipientEmail || 'alexnick20006@gmail.com',
+            dispatchedAt: new Date().toLocaleString()
+          };
+        }
+        return item;
+      }));
+
       setSelectedItem(null);
       setToastMessage(data.message || `⚡ Real Email Dispatched Live to ${recipientEmail || 'Recipient'}!`);
       setTimeout(() => setToastMessage(''), 7000);
-      fetchItems();
     } catch (err) {
       console.error(err);
     } finally {

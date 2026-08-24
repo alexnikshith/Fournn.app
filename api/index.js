@@ -51,46 +51,18 @@ function seedDemoUser(userId, name, email) {
   if (isRealUser) {
     userAttention.set(userId, [
       {
-        _id: 'att_real_sample_' + Date.now(),
+        _id: 'att_real_sample',
         title: 'sample - sample test',
         category: 'Personal',
         priority: 'Urgent',
-        status: 'Resolved & Sent Live',
-        dispatchedTo: 'alexnick20006@gmail.com',
-        dispatchedAt: new Date().toLocaleString(),
+        status: 'Pending Review',
         summary: 'Direct message from alex nick (alexnick20006@gmail.com): sample test stream',
         proposedAction: 'Acknowledge direct message from alex nick',
         draftResponse: 'Hi Alex, thank you for the sample message! I have received your email.',
         evidence: ['Sender: alex nick (alexnick20006@gmail.com)', 'Gmail Primary Stream']
       },
       {
-        _id: 'att_real_atidiv_sent_' + Date.now(),
-        title: 'Re: A new company (Atidiv) is showing interest in your profile',
-        category: 'Career',
-        priority: 'Important',
-        status: 'Resolved & Sent Live',
-        dispatchedTo: 'recruiting@atidiv.com',
-        dispatchedAt: new Date().toLocaleString(),
-        summary: 'Samantha Jo West from Atidiv evaluated your developer profile for career opportunities.',
-        proposedAction: 'Connect with Samantha Jo West regarding Atidiv career opportunity.',
-        draftResponse: 'Hi Samantha, thank you for reaching out! I would love to learn more about career opportunities at Atidiv.',
-        evidence: ['Sender: Samantha Jo West fr. (recruiting@atidiv.com)', 'Gmail Stream']
-      },
-      {
-        _id: 'att_real_accenture_sent_' + Date.now(),
-        title: 'Re: Accenture: Pre-Placement Connect Session on 24th Aug 2026',
-        category: 'Career',
-        priority: 'Urgent',
-        status: 'Resolved & Sent Live',
-        dispatchedTo: 'placement@accenture.com',
-        dispatchedAt: new Date().toLocaleString(),
-        summary: 'Accenture campus recruitment drive pre-placement virtual session response.',
-        proposedAction: 'Acknowledge attendance for Accenture session.',
-        draftResponse: 'Thank you Placement Cell. I have confirmed attendance for the Accenture session at 12:00 PM.',
-        evidence: ['Sender: Nivin (placement@accenture.com)', 'Gmail Stream']
-      },
-      {
-        _id: 'att_real_optimspace_' + Date.now(),
+        _id: 'att_real_optimspace',
         title: 'Front-End Developer Intern @ Optimspace (₹7,500 - ₹15,000 / month)',
         category: 'Career',
         priority: 'Urgent',
@@ -101,7 +73,7 @@ function seedDemoUser(userId, name, email) {
         evidence: ['Sender: Indeed (jobs@indeed.com)', 'Gmail Stream 09:26 AM']
       },
       {
-        _id: 'att_real_atidiv_' + Date.now(),
+        _id: 'att_real_atidiv',
         title: 'A new company (Atidiv) is showing interest in your profile',
         category: 'Career',
         priority: 'Important',
@@ -112,7 +84,7 @@ function seedDemoUser(userId, name, email) {
         evidence: ['Sender: Samantha Jo West fr. (recruiting@atidiv.com)', 'Gmail Stream 11:42 AM']
       },
       {
-        _id: 'att_real_ndli_' + Date.now(),
+        _id: 'att_real_ndli',
         title: 'NDLI Club presents: ServiceNow Administration Fundamentals Event',
         category: 'Education',
         priority: 'Important',
@@ -123,7 +95,7 @@ function seedDemoUser(userId, name, email) {
         evidence: ['Sender: NDLI CLUB (events@ndli.gov.in)', 'Gmail Stream 09:30 AM']
       },
       {
-        _id: 'att_real_accenture_' + Date.now(),
+        _id: 'att_real_accenture',
         title: 'Accenture: Pre-Placement Connect Session on 24th Aug 2026 @ 12:00 PM Virtual',
         category: 'Career',
         priority: 'Urgent',
@@ -134,7 +106,7 @@ function seedDemoUser(userId, name, email) {
         evidence: ['Sender: Nivin (placement@accenture.com)', 'Accenture Outlook attachment']
       },
       {
-        _id: 'att_real_freelancer_' + Date.now(),
+        _id: 'att_real_freelancer',
         title: 'Freelancer: Excel, Data Entry, and Data Management projects for Nikshith',
         category: 'Financial',
         priority: 'Important',
@@ -145,7 +117,7 @@ function seedDemoUser(userId, name, email) {
         evidence: ['Sender: Freelancer (notifications@freelancer.com)', 'Gmail Stream 12:10 PM']
       },
       {
-        _id: 'att_real_unstop_' + Date.now(),
+        _id: 'att_real_unstop',
         title: 'Jia from Unstop: Top hiring opportunities & hackathons near you',
         category: 'Career',
         priority: 'Important',
@@ -156,7 +128,7 @@ function seedDemoUser(userId, name, email) {
         evidence: ['Sender: Jia from Unstop (opportunities@unstop.com)', 'Gmail Stream 09:21 AM']
       },
       {
-        _id: 'att_real_quora_' + Date.now(),
+        _id: 'att_real_quora',
         title: 'Quora Digest: Latest software engineering & tech discussions',
         category: 'Promotions',
         priority: 'Normal',
