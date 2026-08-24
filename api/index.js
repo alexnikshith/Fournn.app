@@ -171,7 +171,7 @@ function seedDemoUser(userId, name, email) {
       }
     ]);
 
-    // PRE-POPULATE PERMANENT DISPATCHED HISTORY STORE
+    // PRE-POPULATE PERMANENT DISPATCHED HISTORY STORE (ALL SENT EMAILS IRRESPECTIVE OF DATE)
     userDispatchedMap.set(userId, [
       {
         _id: 'att_real_sample_sent',
@@ -180,7 +180,7 @@ function seedDemoUser(userId, name, email) {
         priority: 'Urgent',
         status: 'Resolved & Sent Live',
         dispatchedTo: 'alexnick20006@gmail.com',
-        dispatchedAt: new Date().toLocaleString(),
+        dispatchedAt: '8/24/2026, 6:01:45 PM',
         summary: 'Direct message from alex nick (alexnick20006@gmail.com): sample test stream',
         proposedAction: 'Acknowledge direct message from alex nick',
         draftResponse: 'Hi Alex, thank you for the sample message! I have received your email 123.',
@@ -193,7 +193,7 @@ function seedDemoUser(userId, name, email) {
         priority: 'Urgent',
         status: 'Resolved & Sent Live',
         dispatchedTo: 'placement@accenture.com',
-        dispatchedAt: new Date().toLocaleString(),
+        dispatchedAt: '8/24/2026, 5:45:10 PM',
         summary: 'Accenture campus recruitment drive pre-placement virtual session response.',
         proposedAction: 'Acknowledge attendance for Accenture session.',
         draftResponse: 'Thank you Placement Cell. I have confirmed attendance for the Accenture session at 12:00 PM.',
@@ -206,11 +206,37 @@ function seedDemoUser(userId, name, email) {
         priority: 'Important',
         status: 'Resolved & Sent Live',
         dispatchedTo: 'recruiting@atidiv.com',
-        dispatchedAt: new Date().toLocaleString(),
+        dispatchedAt: '8/24/2026, 4:30:22 PM',
         summary: 'Samantha Jo West from Atidiv evaluated your developer profile for career opportunities.',
         proposedAction: 'Connect with Samantha Jo West regarding Atidiv career opportunity.',
         draftResponse: 'Hi Samantha, thank you for reaching out! I would love to learn more about career opportunities at Atidiv.',
         evidence: ['Sender: Samantha Jo West fr. (recruiting@atidiv.com)', 'Gmail Stream']
+      },
+      {
+        _id: 'att_real_optimspace_sent',
+        title: 'Re: Front-End Developer Intern @ Optimspace',
+        category: 'Career',
+        priority: 'Urgent',
+        status: 'Resolved & Sent Live',
+        dispatchedTo: 'jobs@indeed.com',
+        dispatchedAt: '8/24/2026, 3:15:00 PM',
+        summary: 'Front-End Developer Internship application response.',
+        proposedAction: 'Submitted application for Optimspace internship.',
+        draftResponse: 'Hi Optimspace Hiring Team, I am interested in the Front-End Developer Intern position. My full-stack portfolio is ready for review.',
+        evidence: ['Sender: Indeed (jobs@indeed.com)', 'Gmail Stream']
+      },
+      {
+        _id: 'att_real_freelancer_sent',
+        title: 'Re: Freelancer: Excel, Data Entry, and Data Management projects',
+        category: 'Financial',
+        priority: 'Important',
+        status: 'Resolved & Sent Live',
+        dispatchedTo: 'notifications@freelancer.com',
+        dispatchedAt: '8/24/2026, 2:10:40 PM',
+        summary: 'High-value freelance project match proposal.',
+        proposedAction: 'Submitted project proposal.',
+        draftResponse: 'Hi Freelancer Team, thank you for the project recommendations.',
+        evidence: ['Sender: Freelancer (notifications@freelancer.com)', 'Gmail Stream']
       }
     ]);
   } else {
@@ -684,6 +710,28 @@ app.get(['/api/activity', '/activity'], authMiddleware, (req, res) => {
     }
   ];
   res.json({ activities: runs });
+});
+
+// DECISIONS ENDPOINT
+app.get(['/api/decisions', '/decisions'], authMiddleware, (req, res) => {
+  let decs = userDecisions.get(req.userId);
+  if (!decs || !Array.isArray(decs) || decs.length === 0) {
+    const user = usersById.get(req.userId);
+    seedDemoUser(req.userId, user?.name || 'Nikshith', user?.email || 'nikshithgurram2006@gmail.com');
+    decs = userDecisions.get(req.userId) || [];
+  }
+  res.json({ decisions: decs });
+});
+
+// GOALS ENDPOINT
+app.get(['/api/goals', '/goals'], authMiddleware, (req, res) => {
+  let goals = userGoals.get(req.userId);
+  if (!goals || !Array.isArray(goals) || goals.length === 0) {
+    const user = usersById.get(req.userId);
+    seedDemoUser(req.userId, user?.name || 'Nikshith', user?.email || 'nikshithgurram2006@gmail.com');
+    goals = userGoals.get(req.userId) || [];
+  }
+  res.json({ goals });
 });
 
 // Catch-all 404 handler for unmatched API routes
