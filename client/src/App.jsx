@@ -16,7 +16,7 @@ import GoalsPage from './pages/GoalsPage';
 import AgentsPage from './pages/AgentsPage';
 import ActivityPage from './pages/ActivityPage';
 import MemoryPage from './pages/MemoryPage';
-import IntegrationsSettingsPage from './pages/IntegrationsSettingsPage';
+import SituationDetailPage from './pages/SituationDetailPage';
 
 function ProtectedLayout({ children }) {
   const { user, loading } = useAuth();
@@ -115,6 +115,7 @@ export default function App() {
         <Route path="/agents" element={<ProtectedLayout><AgentsPage /></ProtectedLayout>} />
         <Route path="/activity" element={<ProtectedLayout><ActivityPage /></ProtectedLayout>} />
         <Route path="/memory" element={<ProtectedLayout><MemoryPage /></ProtectedLayout>} />
+        <Route path="/situations/:id" element={<ProtectedLayout><SituationDetailPage /></ProtectedLayout>} />
         <Route path="/integrations" element={<ProtectedLayout><IntegrationsSettingsPage /></ProtectedLayout>} />
 
         {/* Catch-all fallback */}
