@@ -125,8 +125,14 @@ export default function AttentionPage() {
   };
 
   const filteredItems = items.filter(item => {
-    if (activeTab === 'all') return item.status !== 'Resolved & Sent Live' && item.status !== 'Resolved';
-    return item.category.toLowerCase() === activeTab.toLowerCase() || item.priority.toLowerCase() === activeTab.toLowerCase();
+    if (activeTab === 'dispatched') {
+      return item.status === 'Resolved & Sent Live' || item.status === 'Resolved';
+    }
+    if (activeTab === 'all') {
+      return item.status !== 'Resolved & Sent Live' && item.status !== 'Resolved';
+    }
+    return (item.category && item.category.toLowerCase() === activeTab.toLowerCase()) || 
+           (item.priority && item.priority.toLowerCase() === activeTab.toLowerCase());
   });
 
   return (
@@ -168,11 +174,12 @@ export default function AttentionPage() {
 
       {/* Category Tabs */}
       <div className="tab-group">
-        {['all', 'Career', 'Personal', 'Financial', 'Education', 'Promotions', 'Urgent', 'Important'].map(tab => (
+        {['all', 'dispatched', 'Career', 'Personal', 'Financial', 'Education', 'Promotions', 'Urgent', 'Important'].map(tab => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
             className={`tab-btn ${activeTab === tab ? 'active' : ''}`}
+            style={tab === 'dispatched' ? { color: 'var(--emerald-accent)', fontWeight: 700 } : {}}
           >
             {tab.toUpperCase()}
           </button>

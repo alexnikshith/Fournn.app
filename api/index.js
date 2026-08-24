@@ -456,7 +456,7 @@ app.post(['/api/attention/:id/execute', '/attention/:id/execute'], authMiddlewar
   const items = userAttention.get(req.userId) || [];
   const targetItem = items.find(item => item._id === req.params.id);
 
-  const targetRecipient = recipientEmail || (targetItem?.evidence?.[0]?.includes('@') ? targetItem.evidence[0].replace('Sender: ', '') : 'placement@accenture.com');
+  const targetRecipient = recipientEmail || (targetItem?.evidence?.[0]?.includes('@') ? targetItem.evidence[0].replace('Sender: ', '') : 'alexnick20006@gmail.com');
   const emailContent = actionDraft || targetItem?.draftResponse || 'Confirmed.';
 
   let realEmailDispatched = false;
@@ -493,7 +493,12 @@ app.post(['/api/attention/:id/execute', '/attention/:id/execute'], authMiddlewar
     dispatchMessage = `Real email dispatched for ${targetRecipient}`;
   }
 
-  const updatedItems = items.map(item => item._id === req.params.id ? { ...item, status: 'Resolved & Sent Live' } : item);
+  const updatedItems = items.map(item => item._id === req.params.id ? { 
+    ...item, 
+    status: 'Resolved & Sent Live',
+    dispatchedTo: targetRecipient,
+    dispatchedAt: new Date().toLocaleString()
+  } : item);
   userAttention.set(req.userId, updatedItems);
 
   // Log to Agent Activity Audit Log
@@ -501,7 +506,7 @@ app.post(['/api/attention/:id/execute', '/attention/:id/execute'], authMiddlewar
     req.userId,
     'ExecutionAgent',
     `Real-Time Email Sent to: ${targetRecipient}`,
-    `Dispatched response via ${dispatchMethod || 'Real-Time Email Engine'} for: ${targetItem ? targetItem.title : 'Email Item'}`,
+    `Dispatched response via ${dispatchMethod || 'Real Gmail Account'} for: ${targetItem ? targetItem.title : 'Email Item'}`,
     true
   );
 
