@@ -337,7 +337,7 @@ app.get(['/api/auth/me', '/auth/me'], authMiddleware, (req, res) => {
 // 2. DASHBOARD
 const dashboardHandler = (req, res) => {
   let items = userAttention.get(req.userId);
-  if (!items || items.length === 0) {
+  if (!items || !Array.isArray(items) || items.length === 0) {
     const user = usersById.get(req.userId);
     seedDemoUser(req.userId, user?.name || 'Nikshith', user?.email || 'nikshithgurram2006@gmail.com');
     items = userAttention.get(req.userId) || [];
@@ -345,17 +345,22 @@ const dashboardHandler = (req, res) => {
   const decs = userDecisions.get(req.userId) || [];
   const goals = userGoals.get(req.userId) || [];
 
+  // Active pending items needing attention (excluding dispatched items)
+  const pendingItems = items.filter(i => i.status !== 'Resolved & Sent Live' && i.status !== 'Resolved');
+  const urgentItems = pendingItems.filter(i => i.priority === 'Urgent');
+
   res.json({
     metrics: {
-      needAttention: items.length || 2,
-      pendingDecisions: decs.length || 1,
-      activeGoals: goals.length || 1,
-      urgentAlerts: items.filter(i => i.priority === 'Urgent').length || 1
+      needAttention: pendingItems.length,
+      pendingDecisions: decs.length,
+      activeGoals: goals.length,
+      urgentAlerts: urgentItems.length
     },
-    topAttentionItems: items.slice(0, 3),
+    topAttentionItems: pendingItems.slice(0, 3),
     recentAgentRuns: [
-      { agentName: 'FollowUpAgent', action: 'Synced Gmail inbox & flagged Accenture placement invite', status: 'Requires Approval', createdAt: new Date() },
-      { agentName: 'ContextAgent', action: 'Linked Accenture connect session to Career goal', status: 'Verified', createdAt: new Date() }
+      { agentName: 'ExecutionAgent', action: 'Synced Gmail inbox & monitored active attention streams', status: 'Verified', createdAt: new Date() },
+      { agentName: 'FollowUpAgent', action: 'Flagged urgent career & personal email streams', status: 'Requires Approval', createdAt: new Date() },
+      { agentName: 'ContextAgent', action: 'Mapped active commitments to Personal Context Graph', status: 'Verified', createdAt: new Date() }
     ]
   });
 };
