@@ -53,7 +53,8 @@ export default function ActivityPage() {
                   <h3 style={{ fontSize: '1.05rem' }}>{run.action}</h3>
                 </div>
 
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+                  <span className="badge badge-info" style={{ fontSize: '0.75rem' }}>LEVEL 3 — EXECUTE WITH APPROVAL</span>
                   <span className={`badge ${run.userApproved ? 'badge-resolved' : 'badge-important'}`}>
                     {run.userApproved ? 'User Approved' : 'Pending Approval'}
                   </span>
