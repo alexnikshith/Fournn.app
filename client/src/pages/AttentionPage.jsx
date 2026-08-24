@@ -1,9 +1,13 @@
 import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { AlertCircle, CheckCircle2, XCircle, Send, FileText, Check, Sparkles, Trash2, Plus, Mail, CheckCircle } from 'lucide-react';
 
 export default function AttentionPage() {
   const { token } = useAuth();
+  const [searchParams] = useSearchParams();
+  const reviewId = searchParams.get('reviewId');
+
   const [items, setItems] = useState([]);
   const [activeTab, setActiveTab] = useState('all');
   const [loading, setLoading] = useState(true);
@@ -23,6 +27,19 @@ export default function AttentionPage() {
   const [emailBody, setEmailBody] = useState('');
   const [ingestLoading, setIngestLoading] = useState(false);
 
+  const openReviewModal = (item) => {
+    if (!item) return;
+    setSelectedItem(item);
+    setEditedDraft(item.draftResponse || '');
+    // Extract exact clean email address from item evidence or fallback
+    let extractedRecipient = 'alexnick20006@gmail.com';
+    if (item.evidence && item.evidence[0]) {
+      const match = item.evidence[0].match(/([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/);
+      if (match) extractedRecipient = match[1].toLowerCase();
+    }
+    setRecipientEmail(extractedRecipient);
+  };
+
   const fetchItems = () => {
     setLoading(true);
     fetch('/api/attention', {
@@ -30,7 +47,14 @@ export default function AttentionPage() {
     })
       .then(res => res.json())
       .then(data => {
-        setItems(data.items || []);
+        const fetchedItems = data.items || [];
+        setItems(fetchedItems);
+
+        // Auto open review modal if reviewId parameter is passed in URL
+        if (reviewId) {
+          const target = fetchedItems.find(i => i._id === reviewId);
+          if (target) openReviewModal(target);
+        }
       })
       .catch(err => console.error(err))
       .finally(() => setLoading(false));
@@ -44,7 +68,7 @@ export default function AttentionPage() {
     };
     window.addEventListener('fournn_sync_event', handleSyncEvent);
     return () => window.removeEventListener('fournn_sync_event', handleSyncEvent);
-  }, [token]);
+  }, [token, reviewId]);
 
   const handleClearDemoData = async () => {
     if (!confirm('Are you sure you want to clear sample demo items and keep only real emails?')) return;
@@ -126,18 +150,6 @@ export default function AttentionPage() {
     }
   };
 
-  const openReviewModal = (item) => {
-    setSelectedItem(item);
-    setEditedDraft(item.draftResponse || '');
-    // Extract exact clean email address from item evidence or fallback
-    let extractedRecipient = 'alexnick20006@gmail.com';
-    if (item.evidence && item.evidence[0]) {
-      const match = item.evidence[0].match(/([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/);
-      if (match) extractedRecipient = match[1].toLowerCase();
-    }
-    setRecipientEmail(extractedRecipient);
-  };
-
   const filteredItems = items.filter(item => {
     const isDispatched = item.status === 'Resolved & Sent Live' || item.status === 'Resolved';
 
@@ -146,13 +158,15 @@ export default function AttentionPage() {
       return isDispatched;
     }
 
-    // ALL other tabs show active pending emails needing review/dispatch
-    if (isDispatched) return false;
+    if (activeTab === 'all') {
+      return true;
+    }
 
-    if (activeTab === 'all') return true;
-
-    return (item.category && item.category.toLowerCase() === activeTab.toLowerCase()) || 
-           (item.priority && item.priority.toLowerCase() === activeTab.toLowerCase());
+    // Check if category or priority matches tab
+    const matchesCategory = (item.category && item.category.toLowerCase() === activeTab.toLowerCase()) || 
+                            (item.priority && item.priority.toLowerCase() === activeTab.toLowerCase());
+    
+    return matchesCategory;
   });
 
   return (

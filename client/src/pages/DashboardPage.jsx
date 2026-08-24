@@ -232,7 +232,7 @@ export default function DashboardPage() {
                   <span style={{ fontSize: '0.82rem', color: 'var(--gold-main)', fontWeight: 600 }}>
                     ⚡ Action Draft Ready
                   </span>
-                  <Link to="/attention" className="btn btn-secondary btn-sm" style={{ padding: '0.4rem 0.85rem' }}>
+                  <Link to={`/attention?reviewId=${item._id}`} className="btn btn-secondary btn-sm" style={{ padding: '0.4rem 0.85rem' }}>
                     Review Action
                   </Link>
                 </div>
