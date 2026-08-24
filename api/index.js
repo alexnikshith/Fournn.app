@@ -24,6 +24,50 @@ function seedDemoUser(userId, name, email) {
   if (isRealUser) {
     userAttention.set(userId, [
       {
+        _id: 'att_real_sample_' + Date.now(),
+        title: 'sample',
+        category: 'Personal',
+        priority: 'Urgent',
+        status: 'Pending Review',
+        summary: 'Direct message from alex nick: sample test',
+        proposedAction: 'Acknowledge direct message from alex nick',
+        draftResponse: 'Hi Alex, thank you for the sample message! I have received your email.',
+        evidence: ['Sender: alex nick (alexnick2006@gmail.com)', 'Gmail Primary Inbox Stream']
+      },
+      {
+        _id: 'att_real_optimspace_' + Date.now(),
+        title: 'Front-End Developer Intern @ Optimspace (₹7,500 - ₹15,000 / month)',
+        category: 'Career',
+        priority: 'Urgent',
+        status: 'Pending Review',
+        summary: 'Front-End Developer Internship opportunity matching your full-stack web development profile.',
+        proposedAction: 'Apply for Optimspace internship and send updated resume context.',
+        draftResponse: 'Hi Optimspace Hiring Team, I am interested in the Front-End Developer Intern position. My full-stack portfolio is ready for review.',
+        evidence: ['Sender: Indeed (jobs@indeed.com)', 'Gmail Stream 09:26 AM']
+      },
+      {
+        _id: 'att_real_atidiv_' + Date.now(),
+        title: 'A new company (Atidiv) is showing interest in your profile',
+        category: 'Career',
+        priority: 'Important',
+        status: 'Pending Review',
+        summary: 'Samantha Jo West from Atidiv evaluated your developer profile for career matching opportunities.',
+        proposedAction: 'Connect with Samantha Jo West regarding Atidiv career opportunity.',
+        draftResponse: 'Hi Samantha, thank you for reaching out! I would love to learn more about career opportunities at Atidiv.',
+        evidence: ['Sender: Samantha Jo West fr. (recruiting@atidiv.com)', 'Gmail Stream 11:42 AM']
+      },
+      {
+        _id: 'att_real_ndli_' + Date.now(),
+        title: 'NDLI Club presents: ServiceNow Administration Fundamentals Event',
+        category: 'Career',
+        priority: 'Important',
+        status: 'Pending Review',
+        summary: 'Invitation to virtual workshop on ServiceNow Administration Fundamentals.',
+        proposedAction: 'Register for ServiceNow workshop and set calendar reminder.',
+        draftResponse: 'Thank you NDLI Club! I have registered for the ServiceNow Administration Fundamentals session.',
+        evidence: ['Sender: NDLI CLUB (events@ndli.gov.in)', 'Gmail Stream 09:30 AM']
+      },
+      {
         _id: 'att_real_accenture_' + Date.now(),
         title: 'Accenture: Pre-Placement Connect Session on 24th Aug 2026 @ 12:00 PM Virtual',
         category: 'Career',
@@ -32,18 +76,18 @@ function seedDemoUser(userId, name, email) {
         summary: 'Accenture campus recruitment drive pre-placement virtual session link & briefing details.',
         proposedAction: 'Acknowledge attendance and set calendar reminder for 12:00 PM today.',
         draftResponse: 'Thank you Placement Cell. I have confirmed attendance for the Accenture session at 12:00 PM.',
-        evidence: ['Gmail Stream: Nivin (placement@accenture.com)', 'Accenture Outlook attachment']
+        evidence: ['Sender: Nivin (placement@accenture.com)', 'Accenture Outlook attachment']
       },
       {
-        _id: 'att_real_fullstack_' + Date.now(),
-        title: 'Full Stack Web Development Roles (Hyderabad District) [₹9.5L - ₹15L+]',
-        category: 'Career',
+        _id: 'att_real_freelancer_' + Date.now(),
+        title: 'Freelancer: Excel, Data Entry, and Data Management projects for Nikshith',
+        category: 'Financial',
         priority: 'Important',
         status: 'Pending Review',
-        summary: 'Hiring Now alert for Senior Full Stack Engineer positions in Hyderabad.',
-        proposedAction: 'Review job requirements and prepare updated resume context.',
-        draftResponse: 'Hi Team, please share the direct application link for the Hyderabad Full Stack positions.',
-        evidence: ['Gmail Stream: Hiring Now Newsletter']
+        summary: 'High-value freelance project matches available for Nikshith.',
+        proposedAction: 'Review project bids and submit proposal context.',
+        draftResponse: 'Hi Freelancer Team, thank you for the project recommendations.',
+        evidence: ['Sender: Freelancer (notifications@freelancer.com)', 'Gmail Stream 12:10 PM']
       }
     ]);
 
@@ -56,6 +100,15 @@ function seedDemoUser(userId, name, email) {
         recommendedOption: 'Attend virtual session at 12:00 PM PST',
         confidenceScore: 98,
         summary: 'Pre-placement orientation requirement for upcoming campus selection process.'
+      },
+      {
+        _id: 'dec_real_2',
+        title: 'Optimspace Front-End Developer Internship Application',
+        category: 'Career',
+        status: 'In Review',
+        recommendedOption: 'Submit application for ₹15,000/mo Front-End Intern Role',
+        confidenceScore: 92,
+        summary: 'Matched with full stack web development goals.'
       }
     ]);
 
@@ -64,7 +117,7 @@ function seedDemoUser(userId, name, email) {
         _id: 'goal_real_1',
         title: 'Secure High-Growth Full-Stack / AI Engineer Offer',
         category: 'Career',
-        progress: 75,
+        progress: 80,
         targetDate: '2026-09-30'
       }
     ]);
