@@ -377,8 +377,8 @@ export default function AttentionPage() {
                 style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }}
                 onClick={() => setShowSenderConfig(!showSenderConfig)}
               >
-                <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--gold-main)' }}>
-                  ⚙️ Send From My Gmail Account (Optional Direct SMTP)
+                <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--emerald-accent)' }}>
+                  ⚡ Direct Gmail SMTP Dissemination Enabled (1-Click Sent Items Sync)
                 </span>
                 <span style={{ fontSize: '0.8rem', color: 'var(--text-dim)' }}>{showSenderConfig ? 'Hide' : 'Configure'}</span>
               </div>
