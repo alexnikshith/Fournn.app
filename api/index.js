@@ -749,11 +749,15 @@ app.get(['/api/attention', '/attention'], authMiddleware, (req, res) => {
     }
   ];
 
-  // Force merge live emails at the top of items list
+  // Force merge live emails at the top of items list (preserving resolved status)
   for (const defItem of [...defaultEmails].reverse()) {
-    const idx = items.findIndex(i => i.title.toLowerCase() === defItem.title.toLowerCase());
-    if (idx !== -1) {
-      items.splice(idx, 1);
+    const existingIndex = items.findIndex(i => i.title.toLowerCase() === defItem.title.toLowerCase());
+    if (existingIndex !== -1) {
+      const existing = items[existingIndex];
+      if (existing.status === 'Resolved & Sent Live' || existing.status === 'Resolved') {
+        continue; // Keep resolved items intact in dispatched tab
+      }
+      items.splice(existingIndex, 1);
     }
     items.unshift(defItem);
   }
