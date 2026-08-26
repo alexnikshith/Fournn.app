@@ -14,8 +14,8 @@ export default function AttentionPage() {
   const [selectedItem, setSelectedItem] = useState(null);
   const [editedDraft, setEditedDraft] = useState('');
   const [recipientEmail, setRecipientEmail] = useState('');
-  const [senderUser, setSenderUser] = useState('nikshithgurram2006@gmail.com');
-  const [senderPass, setSenderPass] = useState('');
+  const [senderUser, setSenderUser] = useState(() => localStorage.getItem('fournn_smtp_user') || 'nikshithgurram2006@gmail.com');
+  const [senderPass, setSenderPass] = useState(() => localStorage.getItem('fournn_smtp_pass') || '');
   const [showSenderConfig, setShowSenderConfig] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
@@ -114,6 +114,9 @@ export default function AttentionPage() {
 
   const handleAction = async (itemId) => {
     setActionLoading(true);
+    if (senderUser) localStorage.setItem('fournn_smtp_user', senderUser);
+    if (senderPass) localStorage.setItem('fournn_smtp_pass', senderPass);
+
     try {
       const res = await fetch(`/api/attention/${itemId}/execute`, {
         method: 'POST',
