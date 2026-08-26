@@ -22,9 +22,9 @@ const userTimeline = new Map();
 const userDispatchedMap = new Map();
 const userGoogleTokens = new Map();
 
-const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || '390952875710-7jjnm8a5l86tk25n457rqi2tvfq2fcd8.apps.googleusercontent.com';
-const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET || '';
-const GOOGLE_REDIRECT_URI = process.env.GOOGLE_REDIRECT_URI || 'https://fournn-app.vercel.app/api/auth/google/callback';
+const GOOGLE_CLIENT_ID = (process.env.GOOGLE_CLIENT_ID || '390952875710-7jjnm8a5l86tk25n457rqi2tvfq2fcd8.apps.googleusercontent.com').trim();
+const GOOGLE_CLIENT_SECRET = (process.env.GOOGLE_CLIENT_SECRET || '').trim();
+const GOOGLE_REDIRECT_URI = (process.env.GOOGLE_REDIRECT_URI || 'https://fournn-app.vercel.app/api/auth/google/callback').trim();
 
 // AI Intelligent Email Categorizer Engine
 function categorizeEmail(subject = '', body = '', sender = '') {
