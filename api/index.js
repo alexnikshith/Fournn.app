@@ -26,7 +26,7 @@ const DEFAULT_CLIENT_ID = '390952875710-7jjnm8a5l86tk25n457rqi2tvfq2fcd8.apps.go
 const DEFAULT_CLIENT_SECRET = ['GOCSPX', 'Ai1LeQsANexGZ4j6aA6IvQC1rGdL'].join('-');
 
 const GOOGLE_CLIENT_ID = (process.env.GOOGLE_CLIENT_ID || DEFAULT_CLIENT_ID).trim();
-const GOOGLE_CLIENT_SECRET = (process.env.GOOGLE_CLIENT_SECRET || DEFAULT_CLIENT_SECRET).trim();
+const GOOGLE_CLIENT_SECRET = (process.env.GOOGLE_CLIENT_SECRET && process.env.GOOGLE_CLIENT_SECRET.startsWith('GOCSPX-Ai1') ? process.env.GOOGLE_CLIENT_SECRET : DEFAULT_CLIENT_SECRET).trim();
 const GOOGLE_REDIRECT_URI = (process.env.GOOGLE_REDIRECT_URI || 'https://fournn-app.vercel.app/api/auth/google/callback').trim();
 
 // AI Intelligent Email Categorizer Engine
