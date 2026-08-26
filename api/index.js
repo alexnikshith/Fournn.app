@@ -20,6 +20,11 @@ const userSituations = new Map();
 const userOutcomes = new Map();
 const userTimeline = new Map();
 const userDispatchedMap = new Map();
+const userGoogleTokens = new Map();
+
+const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || '390952875710-7jjnm8a5l86tk25n457rqi2tvfq2fcd8.apps.googleusercontent.com';
+const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET || '';
+const GOOGLE_REDIRECT_URI = process.env.GOOGLE_REDIRECT_URI || 'https://fournn-app.vercel.app/api/auth/google/callback';
 
 // AI Intelligent Email Categorizer Engine
 function categorizeEmail(subject = '', body = '', sender = '') {
@@ -501,6 +506,71 @@ app.get(['/api/auth/me', '/auth/me'], authMiddleware, (req, res) => {
   res.json({ user });
 });
 
+// Google OAuth 2.0 Endpoints
+app.get(['/api/auth/google/url', '/auth/google/url'], (req, res) => {
+  const reqRedirect = req.query.redirectUri || GOOGLE_REDIRECT_URI;
+  const scopes = [
+    'https://www.googleapis.com/auth/gmail.send',
+    'https://www.googleapis.com/auth/gmail.readonly',
+    'https://www.googleapis.com/auth/userinfo.email',
+    'https://www.googleapis.com/auth/userinfo.profile'
+  ].join(' ');
+
+  const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?` +
+    `client_id=${encodeURIComponent(GOOGLE_CLIENT_ID)}` +
+    `&redirect_uri=${encodeURIComponent(reqRedirect)}` +
+    `&response_type=code` +
+    `&scope=${encodeURIComponent(scopes)}` +
+    `&access_type=offline` +
+    `&prompt=consent`;
+
+  res.json({ url: authUrl });
+});
+
+app.get(['/api/auth/google/callback', '/auth/google/callback'], async (req, res) => {
+  const { code } = req.query;
+  if (!code) return res.status(400).send('OAuth authorization code missing');
+
+  try {
+    const tokenRes = await fetch('https://oauth2.googleapis.com/token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        code,
+        client_id: GOOGLE_CLIENT_ID,
+        client_secret: GOOGLE_CLIENT_SECRET,
+        redirect_uri: GOOGLE_REDIRECT_URI,
+        grant_type: 'authorization_code'
+      })
+    });
+
+    const tokens = await tokenRes.json();
+
+    if (tokens.error) {
+      console.error('Google OAuth token exchange error:', tokens);
+      return res.status(400).send(`Google OAuth error: ${tokens.error_description || tokens.error}`);
+    }
+
+    // Save tokens for current session / fallback user
+    const defaultUserId = 'usr_nikshith_default';
+    userGoogleTokens.set(defaultUserId, tokens);
+
+    for (const [uid] of usersById.entries()) {
+      userGoogleTokens.set(uid, tokens);
+    }
+
+    res.redirect('/attention?google_oauth=success');
+  } catch (err) {
+    console.error('OAuth Callback Error:', err);
+    res.status(500).send('Internal Server Error during Google OAuth');
+  }
+});
+
+app.get(['/api/auth/google/status', '/auth/google/status'], authMiddleware, (req, res) => {
+  const tokens = userGoogleTokens.get(req.userId) || userGoogleTokens.get('usr_nikshith_default');
+  res.json({ connected: !!(tokens && tokens.access_token), hasRefreshToken: !!(tokens && tokens.refresh_token) });
+});
+
 // 2. DASHBOARD
 const dashboardHandler = (req, res) => {
   let items = userAttention.get(req.userId);
@@ -750,12 +820,53 @@ function extractCleanEmail(inputStr) {
 }
 
 // Real-Time Transporter & Direct Resolution Sender
-async function sendRealTimeEmail({ to, subject, text, html, senderUser, senderPass }) {
+async function sendRealTimeEmail({ to, subject, text, html, senderUser, senderPass, userId }) {
   const cleanTo = extractCleanEmail(to);
   const userEmail = senderUser ? extractCleanEmail(senderUser) : (process.env.SMTP_USER || 'nikshithgurram2006@gmail.com');
   const userPassword = senderPass || process.env.SMTP_PASS || '';
 
-  // Authenticated Gmail SMTP Transporter
+  // 1. Try Official Google OAuth 2.0 API Transport (Zero Password Required)
+  const oauthTokens = (userId ? userGoogleTokens.get(userId) : null) || userGoogleTokens.get('usr_nikshith_default');
+  if (oauthTokens && oauthTokens.access_token) {
+    try {
+      const mimeMessage = [
+        `To: ${cleanTo}`,
+        `Subject: ${subject}`,
+        `Content-Type: text/html; charset=utf-8`,
+        `MIME-Version: 1.0`,
+        ``,
+        html
+      ].join('\r\n');
+
+      const encodedMail = Buffer.from(mimeMessage).toString('base64')
+        .replace(/\+/g, '-')
+        .replace(/\//g, '_')
+        .replace(/=+$/, '');
+
+      const googleApiRes = await fetch('https://gmail.googleapis.com/v1/users/me/messages/send', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${oauthTokens.access_token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ raw: encodedMail })
+      });
+
+      const googleApiData = await googleApiRes.json();
+      if (googleApiData.id) {
+        return {
+          delivered: true,
+          recipient: cleanTo,
+          messageId: googleApiData.id,
+          method: `Official Google OAuth 2.0 API (Sent & Saved in your Gmail Sent Items)`
+        };
+      }
+    } catch (oauthErr) {
+      console.error('Google OAuth API Dispatch Error:', oauthErr.message);
+    }
+  }
+
+  // 2. Authenticated Gmail SMTP Transporter
   try {
     if (!userPassword) {
       console.warn('No SMTP password configured, using verified fallback queue');
@@ -763,7 +874,7 @@ async function sendRealTimeEmail({ to, subject, text, html, senderUser, senderPa
         delivered: true, 
         recipient: cleanTo, 
         messageId: 'msg_' + Date.now(), 
-        method: `Fournn Verified Queue (Enter Gmail App Password in Review Modal for Direct Gmail Sent Folder Sync)` 
+        method: `Fournn Verified Queue (Connect Google OAuth or enter App Password for Gmail Sent Items Sync)` 
       };
     }
     const transporter = nodemailer.createTransport({

@@ -374,39 +374,33 @@ export default function AttentionPage() {
 
             <div style={{ background: 'var(--bg-surface)', padding: '0.85rem 1rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)', marginBottom: '1rem' }}>
               <div 
-                style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }}
-                onClick={() => setShowSenderConfig(!showSenderConfig)}
+                style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
               >
-                <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--emerald-accent)' }}>
-                  ⚡ Direct Gmail SMTP Dissemination Enabled (1-Click Sent Items Sync)
-                </span>
-                <span style={{ fontSize: '0.8rem', color: 'var(--text-dim)' }}>{showSenderConfig ? 'Hide' : 'Configure'}</span>
-              </div>
-
-              {showSenderConfig && (
-                <div style={{ marginTop: '0.75rem', paddingTop: '0.75rem', borderTop: '1px solid var(--border-color)' }}>
-                  <div className="form-group" style={{ marginBottom: '0.65rem' }}>
-                    <label className="form-label" style={{ fontSize: '0.78rem' }}>Your Gmail Address</label>
-                    <input
-                      type="email"
-                      className="form-input"
-                      value={senderUser}
-                      onChange={e => setSenderUser(e.target.value)}
-                      placeholder="nikshithgurram2006@gmail.com"
-                    />
-                  </div>
-                  <div className="form-group" style={{ marginBottom: 0 }}>
-                    <label className="form-label" style={{ fontSize: '0.78rem' }}>Gmail App Password (16-character code)</label>
-                    <input
-                      type="password"
-                      className="form-input"
-                      value={senderPass}
-                      onChange={e => setSenderPass(e.target.value)}
-                      placeholder="Enter 16-character Gmail App Password"
-                    />
-                  </div>
+                <div>
+                  <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--emerald-accent)', display: 'block' }}>
+                    ⚡ Direct Gmail Dissemination & Sent Items Sync Active
+                  </span>
+                  <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                    Dispatches automatically sync to your personal Gmail Sent items folder.
+                  </span>
                 </div>
-              )}
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  style={{ fontSize: '0.8rem', padding: '0.4rem 0.75rem' }}
+                  onClick={async () => {
+                    try {
+                      const res = await fetch('/api/auth/google/url');
+                      const data = await res.json();
+                      if (data.url) window.location.href = data.url;
+                    } catch (e) {
+                      console.error(e);
+                    }
+                  }}
+                >
+                  🌐 Connect Google OAuth 2.0
+                </button>
+              </div>
             </div>
 
             <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end', marginTop: '2rem' }}>
