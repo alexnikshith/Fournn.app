@@ -168,6 +168,15 @@ export default function AttentionPage() {
     return matchesCategory;
   });
 
+  const getTabCount = (tab) => {
+    if (tab === 'all') return items.length;
+    if (tab === 'dispatched') return items.filter(i => i.status === 'Resolved & Sent Live' || i.status === 'Resolved').length;
+    return items.filter(i => 
+      (i.category && i.category.toLowerCase() === tab.toLowerCase()) || 
+      (i.priority && i.priority.toLowerCase() === tab.toLowerCase())
+    ).length;
+  };
+
   return (
     <div style={{ width: '100%' }}>
       {toastMessage && (
@@ -205,7 +214,7 @@ export default function AttentionPage() {
         </div>
       </div>
 
-      {/* Category Tabs */}
+      {/* Category Tabs with Item Counts */}
       <div className="tab-group">
         {['all', 'dispatched', 'Career', 'Personal', 'Financial', 'Education', 'Promotions', 'Urgent', 'Important'].map(tab => (
           <button
@@ -214,7 +223,7 @@ export default function AttentionPage() {
             className={`tab-btn ${activeTab === tab ? 'active' : ''}`}
             style={tab === 'dispatched' ? { color: 'var(--emerald-accent)', fontWeight: 700 } : {}}
           >
-            {tab.toUpperCase()}
+            {tab.toUpperCase()} ({getTabCount(tab)})
           </button>
         ))}
       </div>

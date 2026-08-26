@@ -137,6 +137,83 @@ function seedDemoUser(userId, name, email) {
       proposedAction: 'Archive update newsletter.',
       draftResponse: 'Noted digest update.',
       evidence: ['Sender: Quora Digest (digest@quora.com)', 'Gmail Updates Stream']
+    },
+    {
+      _id: 'att_real_deloitte',
+      title: 'New jobs posted from southasiacareers.deloitte.com',
+      category: 'Career',
+      priority: 'Important',
+      status: 'Pending Review',
+      summary: 'You are receiving this email because you joined the Deloitte Talent Community. New engineering & tech roles are open for application.',
+      proposedAction: 'Review Deloitte South Asia career openings and submit profile.',
+      draftResponse: 'Hi Deloitte Talent Team, thank you for the career updates. I am reviewing the new engineering roles.',
+      evidence: ['Sender: deloittesh-jobnotif (talent@deloitte.com)', 'Gmail Primary Inbox']
+    },
+    {
+      _id: 'att_real_blackveatch',
+      title: 'New jobs posted from careers.bv.com - Black & Veatch Talent',
+      category: 'Career',
+      priority: 'Important',
+      status: 'Pending Review',
+      summary: 'You are receiving this email because you joined the Black & Veatch Family of Companies Talent Community.',
+      proposedAction: 'Review Black & Veatch engineering vacancies.',
+      draftResponse: 'Thank you Black & Veatch Recruitment Team! I am reviewing the open opportunities.',
+      evidence: ['Sender: blackveatch-jobnoti (careers@bv.com)', 'Gmail Primary Inbox']
+    },
+    {
+      _id: 'att_real_myntra',
+      title: 'French Connection: A Scent That Stays ✨ - Find Your Signature Fragrance',
+      category: 'Promotions',
+      priority: 'Normal',
+      status: 'Pending Review',
+      summary: 'Grab exclusive luxury fragrance offers on Myntra marketplace.',
+      proposedAction: 'Archive promotional offer.',
+      draftResponse: 'Noted Myntra promotional offer.',
+      evidence: ['Sender: Myntra (offers@myntra.com)', 'Gmail Promotions Stream']
+    },
+    {
+      _id: 'att_real_naukri',
+      title: 'Nikshith Gurram, Handpicked New Jobs for you - Engineer Trainee @ Naukri',
+      category: 'Career',
+      priority: 'Urgent',
+      status: 'Pending Review',
+      summary: 'Seize all job opportunities of this week! Handpicked Engineer Trainee roles matching your profile.',
+      proposedAction: 'Apply for Naukri Engineer Trainee positions.',
+      draftResponse: 'Hi Naukri Team, thank you for handpicking Engineer Trainee roles for my profile.',
+      evidence: ['Sender: Naukri Campus Jobs (jobs@naukri.com)', 'Gmail Primary Inbox']
+    },
+    {
+      _id: 'att_real_salesforce',
+      title: 'Last Call: Director - Salesforce Technical Consulting at Salesforce',
+      category: 'Career',
+      priority: 'Urgent',
+      status: 'Pending Review',
+      summary: 'Your job feed for 24 August 2026: Salesforce Technical Consulting opportunity briefing.',
+      proposedAction: 'Evaluate Salesforce Technical Consulting requirements.',
+      draftResponse: 'Hi Nihal, thank you for sharing the Salesforce Technical Consulting position brief.',
+      evidence: ['Sender: Nihal (recruiting@salesforce.com)', 'Gmail Primary Inbox']
+    },
+    {
+      _id: 'att_real_makemytrip',
+      title: 'Long Weekend Trip Back Home or Vacay? Book Here 👈',
+      category: 'Promotions',
+      priority: 'Normal',
+      status: 'Pending Review',
+      summary: 'Grab savings for the upcoming long weekends and flights.',
+      proposedAction: 'Archive travel deals email.',
+      draftResponse: 'Noted travel discount stream.',
+      evidence: ['Sender: MakeMyTrip (promotions@makemytrip.com)', 'Gmail Stream']
+    },
+    {
+      _id: 'att_real_hirist',
+      title: 'New job match: Product Manager - Merchant Side, JustDial',
+      category: 'Career',
+      priority: 'Important',
+      status: 'Pending Review',
+      summary: 'JustDial is hiring tech talent like you. Review product manager & software role requirements.',
+      proposedAction: 'Review Hirist JustDial role requirements.',
+      draftResponse: 'Hi Hirist Tech Team, thank you for matching the Product Manager role.',
+      evidence: ['Sender: hirist.tech (matches@hirist.tech)', 'Gmail Primary Inbox']
     }
   ]);
 
