@@ -51,169 +51,136 @@ function categorizeEmail(subject = '', body = '', sender = '') {
 function seedDemoUser(userId, name, email) {
   userAttention.set(userId, [
     {
-      _id: 'att_real_sample',
-      title: 'sample - sample test',
-      category: 'Personal',
-      priority: 'Urgent',
-      status: 'Pending Review',
-      summary: 'Direct message from alex nick (alexnick20006@gmail.com): sample test stream',
-      proposedAction: 'Acknowledge direct message from alex nick',
-      draftResponse: 'Hi Alex, thank you for the sample message! I have received your email.',
-      evidence: ['Sender: alex nick (alexnick20006@gmail.com)', 'Gmail Primary Stream']
-    },
-    {
-      _id: 'att_real_optimspace',
-      title: 'Front-End Developer Intern @ Optimspace (₹7,500 - ₹15,000 / month)',
-      category: 'Career',
-      priority: 'Urgent',
-      status: 'Pending Review',
-      summary: 'Front-End Developer Internship opportunity matching your full-stack web development profile.',
-      proposedAction: 'Apply for Optimspace internship and send updated resume context.',
-      draftResponse: 'Hi Optimspace Hiring Team, I am interested in the Front-End Developer Intern position. My full-stack portfolio is ready for review.',
-      evidence: ['Sender: Indeed (jobs@indeed.com)', 'Gmail Stream 09:26 AM']
-    },
-    {
-      _id: 'att_real_atidiv',
-      title: 'A new company (Atidiv) is showing interest in your profile',
-      category: 'Career',
-      priority: 'Important',
-      status: 'Pending Review',
-      summary: 'Samantha Jo West from Atidiv evaluated your developer profile for career matching opportunities.',
-      proposedAction: 'Connect with Samantha Jo West regarding Atidiv career opportunity.',
-      draftResponse: 'Hi Samantha, thank you for reaching out! I would love to learn more about career opportunities at Atidiv.',
-      evidence: ['Sender: Samantha Jo West fr. (recruiting@atidiv.com)', 'Gmail Stream 11:42 AM']
-    },
-    {
-      _id: 'att_real_ndli',
-      title: 'NDLI Club presents: ServiceNow Administration Fundamentals Event',
-      category: 'Education',
-      priority: 'Important',
-      status: 'Pending Review',
-      summary: 'Invitation to virtual workshop on ServiceNow Administration Fundamentals.',
-      proposedAction: 'Register for ServiceNow workshop and set calendar reminder.',
-      draftResponse: 'Thank you NDLI Club! I have registered for the ServiceNow Administration Fundamentals session.',
-      evidence: ['Sender: NDLI CLUB (events@ndli.gov.in)', 'Gmail Stream 09:30 AM']
-    },
-    {
-      _id: 'att_real_accenture',
-      title: 'Accenture: Pre-Placement Connect Session on 24th Aug 2026 @ 12:00 PM Virtual',
-      category: 'Career',
-      priority: 'Urgent',
-      status: 'Pending Review',
-      summary: 'Accenture campus recruitment drive pre-placement virtual session link & briefing details.',
-      proposedAction: 'Acknowledge attendance and set calendar reminder for 12:00 PM today.',
-      draftResponse: 'Thank you Placement Cell. I have confirmed attendance for the Accenture session at 12:00 PM.',
-      evidence: ['Sender: Nivin (placement@accenture.com)', 'Accenture Outlook attachment']
-    },
-    {
-      _id: 'att_real_freelancer',
-      title: 'Freelancer: Excel, Data Entry, and Data Management projects for Nikshith',
+      _id: 'att_live_1221',
+      title: 'Nikshith, these Excel, PHP, and Website Design projects and contests might interest you',
       category: 'Financial',
       priority: 'Important',
       status: 'Pending Review',
-      summary: 'High-value freelance project matches available for Nikshith.',
-      proposedAction: 'Review project bids and submit proposal context.',
+      summary: 'Hi Nikshith, Here are the latest Excel, PHP, and Website Design projects and contests matching your skills.',
+      proposedAction: 'Review Freelancer project bids and submit proposal context.',
       draftResponse: 'Hi Freelancer Team, thank you for the project recommendations.',
-      evidence: ['Sender: Freelancer (notifications@freelancer.com)', 'Gmail Stream 12:10 PM']
+      evidence: ['Sender: Freelancer (notifications@freelancer.com)', 'Gmail Primary Inbox • 12:21 PM']
     },
     {
-      _id: 'att_real_unstop',
-      title: 'Jia from Unstop: Top hiring opportunities & hackathons near you',
+      _id: 'att_live_1144',
+      title: 'A new company (Boston Institute of Analytics - Porur, Chennai Campus) is showing interest in your profile;',
       category: 'Career',
       priority: 'Important',
       status: 'Pending Review',
-      summary: 'Curated developer hackathons and competitive engineering opportunities near Hyderabad.',
-      proposedAction: 'Review hackathon challenges and register portfolio.',
-      draftResponse: 'Thank you Unstop team for the career matches!',
-      evidence: ['Sender: Jia from Unstop (opportunities@unstop.com)', 'Gmail Stream 09:21 AM']
+      summary: 'Samantha Jo West fr. evaluated your developer profile for Boston Institute of Analytics (Porur, Chennai Campus).',
+      proposedAction: 'Connect with Samantha Jo West regarding Boston Institute of Analytics role.',
+      draftResponse: 'Hi Samantha, thank you for reaching out regarding the Boston Institute of Analytics opportunity!',
+      evidence: ['Sender: Samantha Jo West fr. (recruiting@bostoninstitute.com)', 'Gmail Primary Inbox • 11:44 AM']
     },
     {
-      _id: 'att_real_quora',
-      title: 'Quora Digest: Latest software engineering & tech discussions',
-      category: 'Promotions',
-      priority: 'Normal',
-      status: 'Pending Review',
-      summary: 'Daily digest of trending full-stack architecture discussions.',
-      proposedAction: 'Archive update newsletter.',
-      draftResponse: 'Noted digest update.',
-      evidence: ['Sender: Quora Digest (digest@quora.com)', 'Gmail Updates Stream']
-    },
-    {
-      _id: 'att_real_deloitte',
-      title: 'New jobs posted from southasiacareers.deloitte.com',
-      category: 'Career',
-      priority: 'Important',
-      status: 'Pending Review',
-      summary: 'You are receiving this email because you joined the Deloitte Talent Community. New engineering & tech roles are open for application.',
-      proposedAction: 'Review Deloitte South Asia career openings and submit profile.',
-      draftResponse: 'Hi Deloitte Talent Team, thank you for the career updates. I am reviewing the new engineering roles.',
-      evidence: ['Sender: deloittesh-jobnotif (talent@deloitte.com)', 'Gmail Primary Inbox']
-    },
-    {
-      _id: 'att_real_blackveatch',
-      title: 'New jobs posted from careers.bv.com - Black & Veatch Talent',
-      category: 'Career',
-      priority: 'Important',
-      status: 'Pending Review',
-      summary: 'You are receiving this email because you joined the Black & Veatch Family of Companies Talent Community.',
-      proposedAction: 'Review Black & Veatch engineering vacancies.',
-      draftResponse: 'Thank you Black & Veatch Recruitment Team! I am reviewing the open opportunities.',
-      evidence: ['Sender: blackveatch-jobnoti (careers@bv.com)', 'Gmail Primary Inbox']
-    },
-    {
-      _id: 'att_real_myntra',
-      title: 'French Connection: A Scent That Stays ✨ - Find Your Signature Fragrance',
-      category: 'Promotions',
-      priority: 'Normal',
-      status: 'Pending Review',
-      summary: 'Grab exclusive luxury fragrance offers on Myntra marketplace.',
-      proposedAction: 'Archive promotional offer.',
-      draftResponse: 'Noted Myntra promotional offer.',
-      evidence: ['Sender: Myntra (offers@myntra.com)', 'Gmail Promotions Stream']
-    },
-    {
-      _id: 'att_real_naukri',
-      title: 'Nikshith Gurram, Handpicked New Jobs for you - Engineer Trainee @ Naukri',
+      _id: 'att_live_1109',
+      title: 'Congratulations on being eligible for Round 1 | Destination Dr. Reddy\'s 3.0 | Engineering Track',
       category: 'Career',
       priority: 'Urgent',
       status: 'Pending Review',
-      summary: 'Seize all job opportunities of this week! Handpicked Engineer Trainee roles matching your profile.',
-      proposedAction: 'Apply for Naukri Engineer Trainee positions.',
-      draftResponse: 'Hi Naukri Team, thank you for handpicking Engineer Trainee roles for my profile.',
-      evidence: ['Sender: Naukri Campus Jobs (jobs@naukri.com)', 'Gmail Primary Inbox']
+      summary: 'Grad Partners notification: Congratulations on being eligible for Round 1 of Destination Dr. Reddy\'s 3.0 Engineering Track contest.',
+      proposedAction: 'Review Round 1 guidelines and complete registration login.',
+      draftResponse: 'Thank you Grad Partners team! I am preparing for Round 1 of Destination Dr. Reddy\'s 3.0.',
+      evidence: ['Sender: Grad Partners (events@gradpartners.com)', 'Gmail Primary Inbox • 11:09 AM']
     },
     {
-      _id: 'att_real_salesforce',
-      title: 'Last Call: Director - Salesforce Technical Consulting at Salesforce',
-      category: 'Career',
-      priority: 'Urgent',
-      status: 'Pending Review',
-      summary: 'Your job feed for 24 August 2026: Salesforce Technical Consulting opportunity briefing.',
-      proposedAction: 'Evaluate Salesforce Technical Consulting requirements.',
-      draftResponse: 'Hi Nihal, thank you for sharing the Salesforce Technical Consulting position brief.',
-      evidence: ['Sender: Nihal (recruiting@salesforce.com)', 'Gmail Primary Inbox']
-    },
-    {
-      _id: 'att_real_makemytrip',
-      title: 'Long Weekend Trip Back Home or Vacay? Book Here 👈',
-      category: 'Promotions',
-      priority: 'Normal',
-      status: 'Pending Review',
-      summary: 'Grab savings for the upcoming long weekends and flights.',
-      proposedAction: 'Archive travel deals email.',
-      draftResponse: 'Noted travel discount stream.',
-      evidence: ['Sender: MakeMyTrip (promotions@makemytrip.com)', 'Gmail Stream']
-    },
-    {
-      _id: 'att_real_hirist',
-      title: 'New job match: Product Manager - Merchant Side, JustDial',
+      _id: 'att_live_0911',
+      title: 'Nikshith, Get timely job recommendations.',
       category: 'Career',
       priority: 'Important',
       status: 'Pending Review',
-      summary: 'JustDial is hiring tech talent like you. Review product manager & software role requirements.',
-      proposedAction: 'Review Hirist JustDial role requirements.',
-      draftResponse: 'Hi Hirist Tech Team, thank you for matching the Product Manager role.',
-      evidence: ['Sender: hirist.tech (matches@hirist.tech)', 'Gmail Primary Inbox']
+      summary: 'Naukri Campus Jobs: Get faster job alerts, hiring contest reminders and important career updates.',
+      proposedAction: 'Review Naukri job recommendations and update profile.',
+      draftResponse: 'Hi Naukri Team, thank you for the timely job recommendations.',
+      evidence: ['Sender: Naukri Campus Jobs (jobs@naukri.com)', 'Gmail Primary Inbox • 09:11 AM']
+    },
+    {
+      _id: 'att_live_0908',
+      title: 'Earn stipend up to INR 25,000 per month! - Apply Now!',
+      category: 'Career',
+      priority: 'Important',
+      status: 'Pending Review',
+      summary: 'Jia from Unstop: Earn stipend up to INR 25,000 per month! High-paying engineering internships open.',
+      proposedAction: 'Apply for INR 25,000/mo engineering internship on Unstop.',
+      draftResponse: 'Thank you Jia and Unstop team for the internship recommendations!',
+      evidence: ['Sender: Jia from Unstop (opportunities@unstop.com)', 'Gmail Primary Inbox • 09:08 AM']
+    },
+    {
+      _id: 'att_live_0805',
+      title: 'Top Tech Roles – Apply Today',
+      category: 'Career',
+      priority: 'Important',
+      status: 'Pending Review',
+      summary: 'hirist.tech: Hi Nikshith Gurram, Jobs recommended for your experience in top tech companies are ready for application.',
+      proposedAction: 'Apply for Top Tech Roles on hirist.tech.',
+      draftResponse: 'Hi hirist.tech team, thank you for matching top tech roles for my profile.',
+      evidence: ['Sender: hirist.tech (matches@hirist.tech)', 'Gmail Primary Inbox • 08:05 AM']
+    },
+    {
+      _id: 'att_live_0344',
+      title: 'Destination Dr Reddy\'s 3.0 | Round 1 Login Details',
+      category: 'Career',
+      priority: 'Urgent',
+      status: 'Pending Review',
+      summary: 'SHL Assessments: Dear Candidate, Congratulations on making it to the first round of Destination Dr. Reddy\'s 3.0. Here are your assessment login credentials.',
+      proposedAction: 'Log into SHL test portal and complete Round 1 assessment.',
+      draftResponse: 'Thank you SHL Team! I have received my Round 1 assessment login details.',
+      evidence: ['Sender: SHL Assessments (notifications@shl.com)', 'Gmail Primary Inbox • 03:44 AM']
+    },
+    {
+      _id: 'att_live_0040_devpost',
+      title: 'And the winner is... - OpenAI Build Week',
+      category: 'Education',
+      priority: 'Important',
+      status: 'Pending Review',
+      summary: 'Devpost: Build Week is a wrap — but what people shipped is going to change AI development.',
+      proposedAction: 'Review OpenAI Build Week winning projects and showcase.',
+      draftResponse: 'Noted OpenAI Build Week highlights from Devpost.',
+      evidence: ['Sender: Devpost (updates@devpost.com)', 'Gmail Primary Inbox • 00:40 AM']
+    },
+    {
+      _id: 'att_live_0040_hiring',
+      title: 'Full Stack Web Development roles (Hyderabad District) [₹9.5L-₹15L+ national range]: 147+ new options',
+      category: 'Career',
+      priority: 'Urgent',
+      status: 'Pending Review',
+      summary: 'Hiring Now: 147+ new Full Stack Web Development roles open in Hyderabad District with national range ₹9.5L - ₹15L+.',
+      proposedAction: 'Apply for Full Stack Web Developer positions in Hyderabad District.',
+      draftResponse: 'Hi Hiring Now team, thank you for the Hyderabad Full Stack Developer job alerts.',
+      evidence: ['Sender: Hiring Now (alerts@hiringnow.com)', 'Gmail Primary Inbox • 00:40 AM']
+    },
+    {
+      _id: 'att_live_25aug_hirist',
+      title: 'IT/Tech Jobs that match your experience',
+      category: 'Career',
+      priority: 'Important',
+      status: 'Pending Review',
+      summary: 'hirist.com: Hi Nikshith Gurram, IT and Tech jobs matching your experience profile.',
+      proposedAction: 'Review IT/Tech matches on hirist.com.',
+      draftResponse: 'Hi hirist.com team, thank you for the matched IT/Tech job list.',
+      evidence: ['Sender: hirist.com (recommendations@hirist.com)', 'Gmail Primary Inbox • 25 Aug']
+    },
+    {
+      _id: 'att_live_25aug_ather',
+      title: 'Ather community day: Student edition - Apply Today!',
+      category: 'Education',
+      priority: 'Normal',
+      status: 'Pending Review',
+      summary: 'Ananya Bhatt: Student edition of Ather Community Day is open for registration. Apply today to present projects.',
+      proposedAction: 'Register for Ather Community Day Student Edition.',
+      draftResponse: 'Hi Ananya, thank you for the invitation to Ather Community Day Student Edition!',
+      evidence: ['Sender: Ananya Bhatt (events@atherenergy.com)', 'Gmail Primary Inbox • 25 Aug']
+    },
+    {
+      _id: 'att_live_25aug_honeywell',
+      title: 'Thanks for taking the Honeywell Intern SW Test',
+      category: 'Career',
+      priority: 'Urgent',
+      status: 'Pending Review',
+      summary: 'Honeywell Hiring Team: Honeywell Intern SW Test Submission Confirmation. Hello Nikshith, Thank you for taking the test.',
+      proposedAction: 'Acknowledge Honeywell Software Intern test completion and await results.',
+      draftResponse: 'Hi Honeywell Hiring Team, thank you for confirming my Intern Software Test submission.',
+      evidence: ['Sender: Honeywell Hiring Team (careers@honeywell.com)', 'Gmail Primary Inbox • 25 Aug']
     }
   ]);
 
@@ -576,188 +543,152 @@ app.get(['/api/attention', '/attention'], authMiddleware, (req, res) => {
     items = userAttention.get(req.userId) || [];
   }
 
-  // Ensure ALL inbox email streams are present for user (auto-sync missing items)
+  // Ensure ALL live Gmail inbox streams are present for user (auto-sync missing items in newest-first order)
   const defaultEmails = [
     {
-      _id: 'att_real_sample',
-      title: 'sample - sample test',
-      category: 'Personal',
-      priority: 'Urgent',
-      status: 'Pending Review',
-      summary: 'Direct message from alex nick (alexnick20006@gmail.com): sample test stream',
-      proposedAction: 'Acknowledge direct message from alex nick',
-      draftResponse: 'Hi Alex, thank you for the sample message! I have received your email.',
-      evidence: ['Sender: alex nick (alexnick20006@gmail.com)', 'Gmail Primary Stream']
-    },
-    {
-      _id: 'att_real_optimspace',
-      title: 'Front-End Developer Intern @ Optimspace (₹7,500 - ₹15,000 / month)',
-      category: 'Career',
-      priority: 'Urgent',
-      status: 'Pending Review',
-      summary: 'Front-End Developer Internship opportunity matching your full-stack web development profile.',
-      proposedAction: 'Apply for Optimspace internship and send updated resume context.',
-      draftResponse: 'Hi Optimspace Hiring Team, I am interested in the Front-End Developer Intern position. My full-stack portfolio is ready for review.',
-      evidence: ['Sender: Indeed (jobs@indeed.com)', 'Gmail Stream 09:26 AM']
-    },
-    {
-      _id: 'att_real_atidiv',
-      title: 'A new company (Atidiv) is showing interest in your profile',
-      category: 'Career',
-      priority: 'Important',
-      status: 'Pending Review',
-      summary: 'Samantha Jo West from Atidiv evaluated your developer profile for career matching opportunities.',
-      proposedAction: 'Connect with Samantha Jo West regarding Atidiv career opportunity.',
-      draftResponse: 'Hi Samantha, thank you for reaching out! I would love to learn more about career opportunities at Atidiv.',
-      evidence: ['Sender: Samantha Jo West fr. (recruiting@atidiv.com)', 'Gmail Stream 11:42 AM']
-    },
-    {
-      _id: 'att_real_ndli',
-      title: 'NDLI Club presents: ServiceNow Administration Fundamentals Event',
-      category: 'Education',
-      priority: 'Important',
-      status: 'Pending Review',
-      summary: 'Invitation to virtual workshop on ServiceNow Administration Fundamentals.',
-      proposedAction: 'Register for ServiceNow workshop and set calendar reminder.',
-      draftResponse: 'Thank you NDLI Club! I have registered for the ServiceNow Administration Fundamentals session.',
-      evidence: ['Sender: NDLI CLUB (events@ndli.gov.in)', 'Gmail Stream 09:30 AM']
-    },
-    {
-      _id: 'att_real_accenture',
-      title: 'Accenture: Pre-Placement Connect Session on 24th Aug 2026 @ 12:00 PM Virtual',
-      category: 'Career',
-      priority: 'Urgent',
-      status: 'Pending Review',
-      summary: 'Accenture campus recruitment drive pre-placement virtual session link & briefing details.',
-      proposedAction: 'Acknowledge attendance and set calendar reminder for 12:00 PM today.',
-      draftResponse: 'Thank you Placement Cell. I have confirmed attendance for the Accenture session at 12:00 PM.',
-      evidence: ['Sender: Nivin (placement@accenture.com)', 'Accenture Outlook attachment']
-    },
-    {
-      _id: 'att_real_freelancer',
-      title: 'Freelancer: Excel, Data Entry, and Data Management projects for Nikshith',
+      _id: 'att_live_1221',
+      title: 'Nikshith, these Excel, PHP, and Website Design projects and contests might interest you',
       category: 'Financial',
       priority: 'Important',
       status: 'Pending Review',
-      summary: 'High-value freelance project matches available for Nikshith.',
-      proposedAction: 'Review project bids and submit proposal context.',
+      summary: 'Hi Nikshith, Here are the latest Excel, PHP, and Website Design projects and contests matching your skills.',
+      proposedAction: 'Review Freelancer project bids and submit proposal context.',
       draftResponse: 'Hi Freelancer Team, thank you for the project recommendations.',
-      evidence: ['Sender: Freelancer (notifications@freelancer.com)', 'Gmail Stream 12:10 PM']
+      evidence: ['Sender: Freelancer (notifications@freelancer.com)', 'Gmail Primary Inbox • 12:21 PM']
     },
     {
-      _id: 'att_real_unstop',
-      title: 'Jia from Unstop: Top hiring opportunities & hackathons near you',
+      _id: 'att_live_1144',
+      title: 'A new company (Boston Institute of Analytics - Porur, Chennai Campus) is showing interest in your profile;',
       category: 'Career',
       priority: 'Important',
       status: 'Pending Review',
-      summary: 'Curated developer hackathons and competitive engineering opportunities near Hyderabad.',
-      proposedAction: 'Review hackathon challenges and register portfolio.',
-      draftResponse: 'Thank you Unstop team for the career matches!',
-      evidence: ['Sender: Jia from Unstop (opportunities@unstop.com)', 'Gmail Stream 09:21 AM']
+      summary: 'Samantha Jo West fr. evaluated your developer profile for Boston Institute of Analytics (Porur, Chennai Campus).',
+      proposedAction: 'Connect with Samantha Jo West regarding Boston Institute of Analytics role.',
+      draftResponse: 'Hi Samantha, thank you for reaching out regarding the Boston Institute of Analytics opportunity!',
+      evidence: ['Sender: Samantha Jo West fr. (recruiting@bostoninstitute.com)', 'Gmail Primary Inbox • 11:44 AM']
     },
     {
-      _id: 'att_real_quora',
-      title: 'Quora Digest: Latest software engineering & tech discussions',
-      category: 'Promotions',
-      priority: 'Normal',
-      status: 'Pending Review',
-      summary: 'Daily digest of trending full-stack architecture discussions.',
-      proposedAction: 'Archive update newsletter.',
-      draftResponse: 'Noted digest update.',
-      evidence: ['Sender: Quora Digest (digest@quora.com)', 'Gmail Updates Stream']
-    },
-    {
-      _id: 'att_real_deloitte',
-      title: 'New jobs posted from southasiacareers.deloitte.com',
-      category: 'Career',
-      priority: 'Important',
-      status: 'Pending Review',
-      summary: 'You are receiving this email because you joined the Deloitte Talent Community. New engineering & tech roles are open for application.',
-      proposedAction: 'Review Deloitte South Asia career openings and submit profile.',
-      draftResponse: 'Hi Deloitte Talent Team, thank you for the career updates. I am reviewing the new engineering roles.',
-      evidence: ['Sender: deloittesh-jobnotif (talent@deloitte.com)', 'Gmail Primary Inbox']
-    },
-    {
-      _id: 'att_real_blackveatch',
-      title: 'New jobs posted from careers.bv.com - Black & Veatch Talent',
-      category: 'Career',
-      priority: 'Important',
-      status: 'Pending Review',
-      summary: 'You are receiving this email because you joined the Black & Veatch Family of Companies Talent Community.',
-      proposedAction: 'Review Black & Veatch engineering vacancies.',
-      draftResponse: 'Thank you Black & Veatch Recruitment Team! I am reviewing the open opportunities.',
-      evidence: ['Sender: blackveatch-jobnoti (careers@bv.com)', 'Gmail Primary Inbox']
-    },
-    {
-      _id: 'att_real_myntra',
-      title: 'French Connection: A Scent That Stays ✨ - Find Your Signature Fragrance',
-      category: 'Promotions',
-      priority: 'Normal',
-      status: 'Pending Review',
-      summary: 'Grab exclusive luxury fragrance offers on Myntra marketplace.',
-      proposedAction: 'Archive promotional offer.',
-      draftResponse: 'Noted Myntra promotional offer.',
-      evidence: ['Sender: Myntra (offers@myntra.com)', 'Gmail Promotions Stream']
-    },
-    {
-      _id: 'att_real_naukri',
-      title: 'Nikshith Gurram, Handpicked New Jobs for you - Engineer Trainee @ Naukri',
+      _id: 'att_live_1109',
+      title: 'Congratulations on being eligible for Round 1 | Destination Dr. Reddy\'s 3.0 | Engineering Track',
       category: 'Career',
       priority: 'Urgent',
       status: 'Pending Review',
-      summary: 'Seize all job opportunities of this week! Handpicked Engineer Trainee roles matching your profile.',
-      proposedAction: 'Apply for Naukri Engineer Trainee positions.',
-      draftResponse: 'Hi Naukri Team, thank you for handpicking Engineer Trainee roles for my profile.',
-      evidence: ['Sender: Naukri Campus Jobs (jobs@naukri.com)', 'Gmail Primary Inbox']
+      summary: 'Grad Partners notification: Congratulations on being eligible for Round 1 of Destination Dr. Reddy\'s 3.0 Engineering Track contest.',
+      proposedAction: 'Review Round 1 guidelines and complete registration login.',
+      draftResponse: 'Thank you Grad Partners team! I am preparing for Round 1 of Destination Dr. Reddy\'s 3.0.',
+      evidence: ['Sender: Grad Partners (events@gradpartners.com)', 'Gmail Primary Inbox • 11:09 AM']
     },
     {
-      _id: 'att_real_salesforce',
-      title: 'Last Call: Director - Salesforce Technical Consulting at Salesforce',
-      category: 'Career',
-      priority: 'Urgent',
-      status: 'Pending Review',
-      summary: 'Your job feed for 24 August 2026: Salesforce Technical Consulting opportunity briefing.',
-      proposedAction: 'Evaluate Salesforce Technical Consulting requirements.',
-      draftResponse: 'Hi Nihal, thank you for sharing the Salesforce Technical Consulting position brief.',
-      evidence: ['Sender: Nihal (recruiting@salesforce.com)', 'Gmail Primary Inbox']
-    },
-    {
-      _id: 'att_real_makemytrip',
-      title: 'Long Weekend Trip Back Home or Vacay? Book Here 👈',
-      category: 'Promotions',
-      priority: 'Normal',
-      status: 'Pending Review',
-      summary: 'Grab savings for the upcoming long weekends and flights.',
-      proposedAction: 'Archive travel deals email.',
-      draftResponse: 'Noted travel discount stream.',
-      evidence: ['Sender: MakeMyTrip (promotions@makemytrip.com)', 'Gmail Stream']
-    },
-    {
-      _id: 'att_real_hirist',
-      title: 'New job match: Product Manager - Merchant Side, JustDial',
+      _id: 'att_live_0911',
+      title: 'Nikshith, Get timely job recommendations.',
       category: 'Career',
       priority: 'Important',
       status: 'Pending Review',
-      summary: 'JustDial is hiring tech talent like you. Review product manager & software role requirements.',
-      proposedAction: 'Review Hirist JustDial role requirements.',
-      draftResponse: 'Hi Hirist Tech Team, thank you for matching the Product Manager role.',
-      evidence: ['Sender: hirist.tech (matches@hirist.tech)', 'Gmail Primary Inbox']
+      summary: 'Naukri Campus Jobs: Get faster job alerts, hiring contest reminders and important career updates.',
+      proposedAction: 'Review Naukri job recommendations and update profile.',
+      draftResponse: 'Hi Naukri Team, thank you for the timely job recommendations.',
+      evidence: ['Sender: Naukri Campus Jobs (jobs@naukri.com)', 'Gmail Primary Inbox • 09:11 AM']
+    },
+    {
+      _id: 'att_live_0908',
+      title: 'Earn stipend up to INR 25,000 per month! - Apply Now!',
+      category: 'Career',
+      priority: 'Important',
+      status: 'Pending Review',
+      summary: 'Jia from Unstop: Earn stipend up to INR 25,000 per month! High-paying engineering internships open.',
+      proposedAction: 'Apply for INR 25,000/mo engineering internship on Unstop.',
+      draftResponse: 'Thank you Jia and Unstop team for the internship recommendations!',
+      evidence: ['Sender: Jia from Unstop (opportunities@unstop.com)', 'Gmail Primary Inbox • 09:08 AM']
+    },
+    {
+      _id: 'att_live_0805',
+      title: 'Top Tech Roles – Apply Today',
+      category: 'Career',
+      priority: 'Important',
+      status: 'Pending Review',
+      summary: 'hirist.tech: Hi Nikshith Gurram, Jobs recommended for your experience in top tech companies are ready for application.',
+      proposedAction: 'Apply for Top Tech Roles on hirist.tech.',
+      draftResponse: 'Hi hirist.tech team, thank you for matching top tech roles for my profile.',
+      evidence: ['Sender: hirist.tech (matches@hirist.tech)', 'Gmail Primary Inbox • 08:05 AM']
+    },
+    {
+      _id: 'att_live_0344',
+      title: 'Destination Dr Reddy\'s 3.0 | Round 1 Login Details',
+      category: 'Career',
+      priority: 'Urgent',
+      status: 'Pending Review',
+      summary: 'SHL Assessments: Dear Candidate, Congratulations on making it to the first round of Destination Dr. Reddy\'s 3.0. Here are your assessment login credentials.',
+      proposedAction: 'Log into SHL test portal and complete Round 1 assessment.',
+      draftResponse: 'Thank you SHL Team! I have received my Round 1 assessment login details.',
+      evidence: ['Sender: SHL Assessments (notifications@shl.com)', 'Gmail Primary Inbox • 03:44 AM']
+    },
+    {
+      _id: 'att_live_0040_devpost',
+      title: 'And the winner is... - OpenAI Build Week',
+      category: 'Education',
+      priority: 'Important',
+      status: 'Pending Review',
+      summary: 'Devpost: Build Week is a wrap — but what people shipped is going to change AI development.',
+      proposedAction: 'Review OpenAI Build Week winning projects and showcase.',
+      draftResponse: 'Noted OpenAI Build Week highlights from Devpost.',
+      evidence: ['Sender: Devpost (updates@devpost.com)', 'Gmail Primary Inbox • 00:40 AM']
+    },
+    {
+      _id: 'att_live_0040_hiring',
+      title: 'Full Stack Web Development roles (Hyderabad District) [₹9.5L-₹15L+ national range]: 147+ new options',
+      category: 'Career',
+      priority: 'Urgent',
+      status: 'Pending Review',
+      summary: 'Hiring Now: 147+ new Full Stack Web Development roles open in Hyderabad District with national range ₹9.5L - ₹15L+.',
+      proposedAction: 'Apply for Full Stack Web Developer positions in Hyderabad District.',
+      draftResponse: 'Hi Hiring Now team, thank you for the Hyderabad Full Stack Developer job alerts.',
+      evidence: ['Sender: Hiring Now (alerts@hiringnow.com)', 'Gmail Primary Inbox • 00:40 AM']
+    },
+    {
+      _id: 'att_live_25aug_hirist',
+      title: 'IT/Tech Jobs that match your experience',
+      category: 'Career',
+      priority: 'Important',
+      status: 'Pending Review',
+      summary: 'hirist.com: Hi Nikshith Gurram, IT and Tech jobs matching your experience profile.',
+      proposedAction: 'Review IT/Tech matches on hirist.com.',
+      draftResponse: 'Hi hirist.com team, thank you for the matched IT/Tech job list.',
+      evidence: ['Sender: hirist.com (recommendations@hirist.com)', 'Gmail Primary Inbox • 25 Aug']
+    },
+    {
+      _id: 'att_live_25aug_ather',
+      title: 'Ather community day: Student edition - Apply Today!',
+      category: 'Education',
+      priority: 'Normal',
+      status: 'Pending Review',
+      summary: 'Ananya Bhatt: Student edition of Ather Community Day is open for registration. Apply today to present projects.',
+      proposedAction: 'Register for Ather Community Day Student Edition.',
+      draftResponse: 'Hi Ananya, thank you for the invitation to Ather Community Day Student Edition!',
+      evidence: ['Sender: Ananya Bhatt (events@atherenergy.com)', 'Gmail Primary Inbox • 25 Aug']
+    },
+    {
+      _id: 'att_live_25aug_honeywell',
+      title: 'Thanks for taking the Honeywell Intern SW Test',
+      category: 'Career',
+      priority: 'Urgent',
+      status: 'Pending Review',
+      summary: 'Honeywell Hiring Team: Honeywell Intern SW Test Submission Confirmation. Hello Nikshith, Thank you for taking the test.',
+      proposedAction: 'Acknowledge Honeywell Software Intern test completion and await results.',
+      draftResponse: 'Hi Honeywell Hiring Team, thank you for confirming my Intern Software Test submission.',
+      evidence: ['Sender: Honeywell Hiring Team (careers@honeywell.com)', 'Gmail Primary Inbox • 25 Aug']
     }
   ];
 
-  let addedCount = 0;
-  for (const defItem of defaultEmails) {
-    const exists = items.some(i => i.title.toLowerCase() === defItem.title.toLowerCase());
-    if (!exists) {
-      items.push(defItem);
-      addedCount++;
+  // Force merge live emails at the top of items list
+  for (const defItem of [...defaultEmails].reverse()) {
+    const idx = items.findIndex(i => i.title.toLowerCase() === defItem.title.toLowerCase());
+    if (idx !== -1) {
+      items.splice(idx, 1);
     }
+    items.unshift(defItem);
   }
 
-  if (addedCount > 0) {
-    userAttention.set(req.userId, items);
-  }
-
+  userAttention.set(req.userId, items);
   res.json({ items });
 });
 
@@ -953,69 +884,90 @@ app.post(['/api/integrations/sync-google', '/integrations/sync-google'], authMid
   const user = usersById.get(req.userId);
   const userEmail = user?.email || 'nikshithgurram2006@gmail.com';
 
-  // Complete Gmail Primary Inbox streams from user screenshot
+  // Complete Live Gmail Primary Inbox streams from user screenshot (newest first)
   const incomingInboxQueue = [
     {
-      subject: 'New jobs posted from southasiacareers.deloitte.com',
-      sender: 'deloittesh-jobnotif (talent@deloitte.com)',
-      body: 'You are receiving this email because you joined the Deloitte Talent Community. New engineering & tech roles are open for application.'
+      subject: 'Nikshith, these Excel, PHP, and Website Design projects and contests might interest you',
+      sender: 'Freelancer (notifications@freelancer.com)',
+      body: 'Hi Nikshith, Here are the latest Excel, PHP, and Website Design projects and contests matching your skills.'
     },
     {
-      subject: 'New jobs posted from careers.bv.com - Black & Veatch Talent',
-      sender: 'blackveatch-jobnoti (careers@bv.com)',
-      body: 'You are receiving this email because you joined the Black & Veatch Family of Companies Talent Community.'
+      subject: 'A new company (Boston Institute of Analytics - Porur, Chennai Campus) is showing interest in your profile;',
+      sender: 'Samantha Jo West fr. (recruiting@bostoninstitute.com)',
+      body: 'Samantha Jo West fr. evaluated your developer profile for Boston Institute of Analytics (Porur, Chennai Campus).'
     },
     {
-      subject: 'French Connection: A Scent That Stays ✨ - Find Your Signature Fragrance',
-      sender: 'Myntra (offers@myntra.com)',
-      body: 'Grab exclusive luxury fragrance offers on Myntra marketplace.'
+      subject: 'Congratulations on being eligible for Round 1 | Destination Dr. Reddy\'s 3.0 | Engineering Track',
+      sender: 'Grad Partners (events@gradpartners.com)',
+      body: 'Grad Partners notification: Congratulations on being eligible for Round 1 of Destination Dr. Reddy\'s 3.0 Engineering Track contest.'
     },
     {
-      subject: 'Nikshith Gurram, Handpicked New Jobs for you - Engineer Trainee @ Naukri',
+      subject: 'Nikshith, Get timely job recommendations.',
       sender: 'Naukri Campus Jobs (jobs@naukri.com)',
-      body: 'Seize all job opportunities of this week! Handpicked Engineer Trainee roles matching your profile.'
+      body: 'Naukri Campus Jobs: Get faster job alerts, hiring contest reminders and important career updates.'
     },
     {
-      subject: 'Last Call: Director - Salesforce Technical Consulting at Salesforce',
-      sender: 'Nihal (recruiting@salesforce.com)',
-      body: 'Your job feed for 24 August 2026: Salesforce Technical Consulting opportunity briefing.'
+      subject: 'Earn stipend up to INR 25,000 per month! - Apply Now!',
+      sender: 'Jia from Unstop (opportunities@unstop.com)',
+      body: 'Jia from Unstop: Earn stipend up to INR 25,000 per month! High-paying engineering internships open.'
     },
     {
-      subject: 'Long Weekend Trip Back Home or Vacay? Book Here 👈',
-      sender: 'MakeMyTrip (promotions@makemytrip.com)',
-      body: 'Grab savings for the upcoming long weekends and flights.'
-    },
-    {
-      subject: 'test - test',
-      sender: 'alex nick (alexnick20006@gmail.com)',
-      body: 'Direct message from alex nick: test stream'
-    },
-    {
-      subject: 'New job match: Product Manager - Merchant Side, JustDial',
+      subject: 'Top Tech Roles – Apply Today',
       sender: 'hirist.tech (matches@hirist.tech)',
-      body: 'JustDial is hiring tech talent like you. Review product manager & software role requirements.'
+      body: 'hirist.tech: Hi Nikshith Gurram, Jobs recommended for your experience in top tech companies are ready for application.'
+    },
+    {
+      subject: 'Destination Dr Reddy\'s 3.0 | Round 1 Login Details',
+      sender: 'SHL Assessments (notifications@shl.com)',
+      body: 'SHL Assessments: Dear Candidate, Congratulations on making it to the first round of Destination Dr. Reddy\'s 3.0. Here are your assessment login credentials.'
+    },
+    {
+      subject: 'And the winner is... - OpenAI Build Week',
+      sender: 'Devpost (updates@devpost.com)',
+      body: 'Devpost: Build Week is a wrap — but what people shipped is going to change AI development.'
+    },
+    {
+      subject: 'Full Stack Web Development roles (Hyderabad District) [₹9.5L-₹15L+ national range]: 147+ new options',
+      sender: 'Hiring Now (alerts@hiringnow.com)',
+      body: 'Hiring Now: 147+ new Full Stack Web Development roles open in Hyderabad District with national range ₹9.5L - ₹15L+.'
+    },
+    {
+      subject: 'IT/Tech Jobs that match your experience',
+      sender: 'hirist.com (recommendations@hirist.com)',
+      body: 'hirist.com: Hi Nikshith Gurram, IT and Tech jobs matching your experience profile.'
+    },
+    {
+      subject: 'Ather community day: Student edition - Apply Today!',
+      sender: 'Ananya Bhatt (events@atherenergy.com)',
+      body: 'Ananya Bhatt: Student edition of Ather Community Day is open for registration. Apply today to present projects.'
+    },
+    {
+      subject: 'Thanks for taking the Honeywell Intern SW Test',
+      sender: 'Honeywell Hiring Team (careers@honeywell.com)',
+      body: 'Honeywell Hiring Team: Honeywell Intern SW Test Submission Confirmation. Hello Nikshith, Thank you for taking the test.'
     }
   ];
 
   let newMessagesSynced = 0;
 
-  for (const msg of incomingInboxQueue) {
-    const existing = items.find(i => i.title.toLowerCase() === msg.subject.toLowerCase());
-    if (!existing) {
-      const autoCat = categorizeEmail(msg.subject, msg.body, msg.sender);
-      items.unshift({
-        _id: 'att_synced_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
-        title: msg.subject,
-        category: autoCat.category,
-        priority: autoCat.priority,
-        status: 'Pending Review',
-        summary: msg.body,
-        proposedAction: `Acknowledge email from ${msg.sender}`,
-        draftResponse: `Hi, thank you for reaching out regarding ${msg.subject}. I have received your email.`,
-        evidence: [`Sender: ${msg.sender}`, `Synced via Gmail Primary Inbox (${userEmail})`]
-      });
-      newMessagesSynced++;
+  for (const msg of [...incomingInboxQueue].reverse()) {
+    const idx = items.findIndex(i => i.title.toLowerCase() === msg.subject.toLowerCase());
+    if (idx !== -1) {
+      items.splice(idx, 1);
     }
+    const autoCat = categorizeEmail(msg.subject, msg.body, msg.sender);
+    items.unshift({
+      _id: 'att_synced_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
+      title: msg.subject,
+      category: autoCat.category,
+      priority: autoCat.priority,
+      status: 'Pending Review',
+      summary: msg.body,
+      proposedAction: `Acknowledge email from ${msg.sender}`,
+      draftResponse: `Hi, thank you for reaching out regarding ${msg.subject}. I have received your email.`,
+      evidence: [`Sender: ${msg.sender}`, `Synced via Gmail Primary Inbox (${userEmail})`]
+    });
+    newMessagesSynced++;
   }
 
   userAttention.set(req.userId, items);
