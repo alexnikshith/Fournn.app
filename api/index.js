@@ -551,7 +551,7 @@ app.get(['/api/auth/google/callback', '/auth/google/callback'], async (req, res)
         client_secret: GOOGLE_CLIENT_SECRET,
         redirect_uri: GOOGLE_REDIRECT_URI,
         grant_type: 'authorization_code'
-      })
+      }).toString()
     });
 
     const tokens = await tokenRes.json();
